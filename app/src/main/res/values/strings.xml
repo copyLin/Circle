@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">Circle</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="permission_denied">Circle已被禁止权限：SD卡写入</string>
+    <string name="server_ip">http://10.29.17.3:8080/CircleServer/</string>
+    <string name="content">content...</string>
+    <string name="delivery_price">费用：</string>
+    <string name="idle_name">物品名称：</string>
+    <string name="idle_price">价格：</string>
+    <string name="idle_detail">详细描述：</string>
+    <string name="lost_label">类型：</string>
+    <string name="lost_time">时间：</string>
+    <string name="lost_location">地点：</string>
+    <string name="lost_contact">联系方式：</string>
+    <string name="lost_detail">更多信息：</string>
+    <string name="data_hint">选择日期</string>
+    <string name="nav_user">个人主页</string>
+    <string name="nav_collections">我的收藏</string>
+    <string name="nav_info">个人资料</string>
+    <string name="nav_setup">设置</string>
+    <string name="login_id">账号</string>
+    <string name="login_password">密码</string>
+    <string name="user_image">头像:</string>
+    <string name="user_id">账号:</string>
+    <string name="user_name">昵称:</string>
+    <string name="footer_state_0">正在加载</string>
+    <string name="footer_state_1">—— 我是有底线的 ——</string>
+    <string name="menu_question">问答</string>
+    <string name="menu_lost">失物</string>
+    <string name="menu_idle">闲置</string>
+    <string name="menu_delivery">跑腿</string>
+
+    <string-array name="label_spinner">
+        <item>LOST</item>
+        <item>FOUND</item>
+    </string-array>
+
+    <string-array name="time_spinner">
+        <item>00:00—06:00</item>
+        <item>06:00—12:00</item>
+        <item>12:00—18:00</item>
+        <item>18:00—24:00</item>
+    </string-array>
+</resources>
