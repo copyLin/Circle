@@ -1,28 +1,27 @@
 package com.example.linxl.circle;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.linxl.circle.gson.IdleItem;
+import com.example.linxl.circle.gson.CommentItem;
 import com.example.linxl.circle.utils.SPUtil;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
- * Created by Linxl on 2018/11/11.
+ * Created by Linxl on 2019/1/20.
  */
 
-public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class MyCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     static final int TYPE_NORMAL = 0;
     static final int TYPE_FOOTER = 1;
@@ -31,31 +30,26 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private int footer_state = 0;
     private Context mContext;
-    private List<IdleItem> mIdleItems;
+    private List<CommentItem> mCommentItems;
 
     private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
 
     class NormalViewHolder extends RecyclerView.ViewHolder{
 
         CardView mCardView;
-        ImageView mImageView;
-        TextView idleName;
-        TextView idleContent;
-        TextView idlePrice;
-        ImageButton commentButton;
-        ImageButton connectButton;
+        CircleImageView mCircleImageView;
+        TextView commentTip;
+        TextView commentTime;
+        TextView commentContent;
 
         public NormalViewHolder(View view){
             super(view);
             mCardView = (CardView) view;
-            mImageView = (ImageView) view.findViewById(R.id.idle_image);
-            idleName = (TextView) view.findViewById(R.id.idle_name);
-            idleContent = (TextView) view.findViewById(R.id.idle_content);
-            idlePrice = (TextView) view.findViewById(R.id.idle_price);
-            commentButton = (ImageButton) view.findViewById(R.id.button_comment);
-            connectButton = (ImageButton) view.findViewById(R.id.button_connect);
+            mCircleImageView = (CircleImageView) view.findViewById(R.id.user_image);
+            commentTip = (TextView) view.findViewById(R.id.comment_tip);
+            commentTime = (TextView) view.findViewById(R.id.comment_time);
+            commentContent = (TextView) view.findViewById(R.id.comment_content);
         }
-
     }
 
     class FooterViewHolder extends RecyclerView.ViewHolder{
@@ -70,8 +64,8 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
     }
 
-    public IdleAdapter(List<IdleItem> idleItems){
-        mIdleItems = idleItems;
+    public MyCommentAdapter(List<CommentItem> commentItems){
+        mCommentItems = commentItems;
     }
 
     @Override
@@ -80,52 +74,35 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             mContext = parent.getContext();
         }
         if (viewType == TYPE_NORMAL){
-            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_idle, parent, false);
+            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_comment_with_tip, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            holder.commentButton.setOnClickListener(new View.OnClickListener() {
+            int position = holder.getAdapterPosition();
+            final CommentItem item = mCommentItems.get(position);
+            holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                 }
             });
-            holder.connectButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = holder.getAdapterPosition();
-                    IdleItem item = mIdleItems.get(position);
-                    Intent intent = new Intent(view.getContext(), ChatActivity.class);
-                    intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
-                    intent.putExtra("toId", item.getUserId());
-                    intent.putExtra("contactImg", item.getUserImg());
-                    mContext.startActivity(intent);
-                }
-            });
             return holder;
-        } else if (viewType == TYPE_FOOTER){
+        }else if (viewType == TYPE_FOOTER){
             View view = LayoutInflater.from(mContext).inflate(R.layout.footer, parent, false);
             FooterViewHolder holder = new FooterViewHolder(view);
             return holder;
         }
         return null;
-
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
         if (holder instanceof NormalViewHolder){
-            IdleItem idleItem = mIdleItems.get(position);
-            ((NormalViewHolder) holder).idleName.setText(idleItem.getIdleName());
-            ((NormalViewHolder) holder).idleContent.setText(idleItem.getContent());
-            ((NormalViewHolder) holder).idlePrice.setText(idleItem.getPrice());
-            Glide.with(mContext).load(R.string.server_ip + "image/" + idleItem.getUserId() + "/" + idleItem.getIdleImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
+            CommentItem commentItem = mCommentItems.get(position);
+            ((NormalViewHolder) holder).commentTip.setText(commentItem.getCommentTip());
+            ((NormalViewHolder) holder).commentTime.setText(commentItem.getCommentTime());
+            ((NormalViewHolder) holder).commentContent.setText(commentItem.getCommentContent());
 
-            if (idleItem.getUserId().equals(userId)) {
-                ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
-                ((NormalViewHolder) holder).connectButton.setEnabled(false);
-            }else {
-                ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect);
-                ((NormalViewHolder) holder).connectButton.setEnabled(true);
-            }
+            Glide.with(mContext).load(R.string.server_ip + "image/user_img/" + commentItem.getUserImg()).into(((NormalViewHolder) holder).mCircleImageView);
+
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {
                 ((FooterViewHolder)holder).mProgressBar.setVisibility(View.GONE);
@@ -142,29 +119,26 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                     break;
             }
         }
-
     }
 
     @Override
-    public int getItemViewType(int position){
-        if (position == getItemCount() - 1 ){
+    public int getItemViewType(int positon){
+        if (positon == getItemCount() - 1) {
             return TYPE_FOOTER;
         }
         return TYPE_NORMAL;
-
     }
 
     @Override
     public int getItemCount(){
-        if (mIdleItems != null){
-            return mIdleItems.size() + 1;
+        if (mCommentItems != null){
+            return mCommentItems.size() + 1;
         }
-        return mIdleItems.size();
+        return mCommentItems.size();
     }
 
     public void changeState(int state) {
         this.footer_state = state;
         notifyDataSetChanged();
     }
-
 }

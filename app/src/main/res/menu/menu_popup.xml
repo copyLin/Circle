@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/edit"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/menu_edit"/>
+    <item
+        android:id="@+id/delete"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/menu_delete"/>
+    <item
+        android:id="@+id/hide"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/menu_hide"/>
+    <item
+        android:id="@+id/like"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/menu_like"/>
+    <item
+        android:id="@+id/report"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/menu_report"/>
+
+</menu>

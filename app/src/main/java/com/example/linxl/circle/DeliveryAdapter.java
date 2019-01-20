@@ -1,6 +1,7 @@
 package com.example.linxl.circle;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -77,12 +78,18 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mContext = parent.getContext();
         }
         if (viewType == TYPE_NORMAL){
-            View view = LayoutInflater.from(mContext).inflate(R.layout.item_delivery, parent, false);
-            NormalViewHolder holder = new NormalViewHolder(view);
+            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_delivery, parent, false);
+            final NormalViewHolder holder = new NormalViewHolder(view);
             holder.connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    int position = holder.getAdapterPosition();
+                    DeliveryItem item = mDeliveryItems.get(position);
+                    Intent intent = new Intent(view.getContext(), ChatActivity.class);
+                    intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
+                    intent.putExtra("toId", item.getUserId());
+                    intent.putExtra("contactImg", item.getUserImg());
+                    mContext.startActivity(intent);
                 }
             });
             return holder;

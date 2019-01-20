@@ -1,12 +1,13 @@
 package com.example.linxl.circle.gson;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Linxl on 2018/11/24.
  */
 
-public class QuestionItem {
+public class QuestionItem implements Serializable {
 
     private String questionId;
     private String userImg;

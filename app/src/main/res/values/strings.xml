@@ -22,15 +22,23 @@
     <string name="nav_setup">设置</string>
     <string name="login_id">账号</string>
     <string name="login_password">密码</string>
-    <string name="user_image">头像:</string>
-    <string name="user_id">账号:</string>
-    <string name="user_name">昵称:</string>
+    <string name="user_image">头像：</string>
+    <string name="user_id">学号：</string>
+    <string name="user_name">昵称：</string>
+    <string name="user_department">院系：</string>
+    <string name="user_major">专业：</string>
+    <string name="user_words">留言：</string>
     <string name="footer_state_0">正在加载</string>
     <string name="footer_state_1">—— 我是有底线的 ——</string>
     <string name="menu_question">问答</string>
     <string name="menu_lost">失物</string>
     <string name="menu_idle">闲置</string>
     <string name="menu_delivery">跑腿</string>
+    <string name="menu_edit">编辑</string>
+    <string name="menu_delete">删除</string>
+    <string name="menu_hide">仅自己可见</string>
+    <string name="menu_like">收藏</string>
+    <string name="menu_report">举报</string>
 
     <string-array name="label_spinner">
         <item>LOST</item>

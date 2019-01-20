@@ -1,11 +1,15 @@
 package com.example.linxl.circle;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -19,7 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.linxl.circle.gson.ChatItem;
 import com.example.linxl.circle.utils.BottomNavigationViewHelper;
+import com.example.linxl.circle.utils.SPUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView mBottomNavigationView;
     private ViewPager mViewPager;
     private MenuItem mMenuItem;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,10 +129,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()){
                     case R.id.nav_user:
+                        startActivity(new Intent(MainActivity.this, HomepageActivity.class));
                         break;
                     case R.id.nav_collections:
-                        break;
-                    case R.id.nav_info:
+
                         break;
                     case R.id.nav_setup:
                         break;
@@ -137,6 +142,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        Intent serviceIntent = new Intent(this, ChatService.class);
+        startService(serviceIntent);
+
+        MessageReceiver messageReceiver = new MessageReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.example.linxl.gduf_im.NEW_MESSAGE");
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(MyApplication.getContext());
+        localBroadcastManager.registerReceiver(messageReceiver, intentFilter);
     }
 
     public boolean onCreateOptionsMenu(Menu menu){
@@ -168,5 +182,18 @@ public class MainActivity extends AppCompatActivity {
             default:
         }
         return true;
+    }
+
+    class MessageReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent){
+            ChatItem item = (ChatItem) intent.getSerializableExtra("new_msg");
+            String userId = (String) SPUtil.getParam(context, SPUtil.USER_ID, "");
+            if(item.getFromId().equals(userId)){
+
+            }else {
+                mFloatingActionButton.setImageResource(R.drawable.ic_chat_new);
+            }
+        }
     }
 }

@@ -2,20 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="wrap_content"
     android:layout_margin="16dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/contact_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
+        android:id="@+id/user_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/user_icon" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_margin="4dp">
 
@@ -31,7 +31,7 @@
                 android:layout_weight="1">
 
                 <TextView
-                    android:id="@+id/contact_name"
+                    android:id="@+id/user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp" />
@@ -41,46 +41,35 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:background="@drawable/badge_background"
-                android:visibility="invisible">
+                android:gravity="center">
 
                 <TextView
-                    android:id="@+id/msg_count"
+                    android:id="@+id/comment_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#ffffff"
-                    android:textSize="10sp" />
+                    android:textColor="#8f8f8f"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
         <TextView
-            android:id="@+id/recent_msg"
+            android:id="@+id/comment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:maxLines="1"
-            android:ellipsize="end"
             android:textSize="12sp"
             android:textColor="#a1a1a1" />
 
-        <LinearLayout
+        <View
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="bottom">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/navHeader"/>
-
-        </LinearLayout>
-
+            android:layout_height="0.5dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/navHeader"/>
 
     </LinearLayout>
 
 </LinearLayout>
+

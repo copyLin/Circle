@@ -1,14 +1,15 @@
 package com.example.linxl.circle;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -22,10 +23,10 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * Created by Linxl on 2018/11/11.
+ * Created by Linxl on 2019/1/17.
  */
 
-public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     static final int TYPE_NORMAL = 0;
     static final int TYPE_FOOTER = 1;
@@ -46,8 +47,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView sendTime;
         TextView questionContent;
         RecyclerView mRecyclerView;
-        ImageButton commentButton;
-        ImageButton connectButton;
+        ImageButton moreButton;
 
         public NormalViewHolder(View view){
             super(view);
@@ -57,8 +57,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             sendTime = (TextView) view.findViewById(R.id.send_time);
             questionContent = (TextView) view.findViewById(R.id.question_content);
             mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-            commentButton = (ImageButton) view.findViewById(R.id.button_comment);
-            connectButton = (ImageButton) view.findViewById(R.id.button_connect);
+            moreButton = (ImageButton) view.findViewById(R.id.button_more);
         }
     }
 
@@ -74,7 +73,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public QuestionAdapter(List<QuestionItem> questionItems){
+    public MyQuestionAdapter(List<QuestionItem> questionItems){
         mQuestionItems = questionItems;
     }
 
@@ -84,26 +83,45 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mContext = parent.getContext();
         }
         if (viewType == TYPE_NORMAL){
-            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_question, parent, false);
+            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_my_question, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
             int position = holder.getAdapterPosition();
             final QuestionItem item = mQuestionItems.get(position);
-            holder.commentButton.setOnClickListener(new View.OnClickListener() {
+            holder.moreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext, QuestionDetailActivity.class);
-                    intent.putExtra("item", item);
-                    mContext.startActivity(intent);
-                }
-            });
-            holder.connectButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(view.getContext(), ChatActivity.class);
-                    intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
-                    intent.putExtra("toId", item.getUserId());
-                    intent.putExtra("contactImg", item.getUserImg());
-                    mContext.startActivity(intent);
+                    PopupMenu popupMenu = new PopupMenu(mContext,v);
+                    popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
+                    popupMenu.show();
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()){
+                                case R.id.edit:
+                                    break;
+                                case R.id.delete:
+                                    break;
+                                case R.id.hide:
+                                    break;
+                                case R.id.like:
+                                    break;
+                                case R.id.report:
+                                    break;
+                                default:
+
+                            }
+                            return true;
+                        }
+                    });
+                    popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
+                        @Override
+                        public void onDismiss(PopupMenu menu) {
+
+                        }
+                    });
+
+                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+
                 }
             });
             return holder;
@@ -135,13 +153,6 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 ((NormalViewHolder) holder).mRecyclerView.setLayoutManager(layoutManager);
                 ((NormalViewHolder) holder).mRecyclerView.setAdapter(adapter);
 
-                if (questionItem.getUserId().equals(userId)) {
-                    ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
-                    ((NormalViewHolder) holder).connectButton.setEnabled(false);
-                }else {
-                    ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect);
-                    ((NormalViewHolder) holder).connectButton.setEnabled(true);
-                }
             }
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {
