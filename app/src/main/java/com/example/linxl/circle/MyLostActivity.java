@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.example.linxl.circle.gson.LostItem;
 import com.example.linxl.circle.utils.HttpUtil;
+import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -30,7 +31,7 @@ public class MyLostActivity extends AppCompatActivity {
     private List<LostItem> allItems;
     private StaggeredGridLayoutManager layoutManager;
     private MyLostAdapter adapter;
-    private String currentId = null;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
 
@@ -68,8 +69,9 @@ public class MyLostActivity extends AppCompatActivity {
     }
 
     private void requestForMyLost() {
-        String address = R.string.server_ip + "MyLostServlet";
+        String address = getString(R.string.server_ip) + "myLostServlet";
         RequestBody requestBody = new FormBody.Builder()
+                .add("userId", (String) SPUtil.getParam(this, SPUtil.USER_ID, ""))
                 .add("currentId", currentId)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {

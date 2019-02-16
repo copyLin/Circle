@@ -1,14 +1,18 @@
 package com.example.linxl.circle;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -21,14 +25,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.ChatItem;
 import com.example.linxl.circle.utils.BottomNavigationViewHelper;
 import com.example.linxl.circle.utils.SPUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,11 +54,16 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        CircleImageView userImage = navigationView.getHeaderView(0).findViewById(R.id.user_image);
+        TextView userName = navigationView.getHeaderView(0).findViewById(R.id.user_name);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.float_button);
         mBottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
+
+        Glide.with(this).load(getString(R.string.server_ip) + "image/user_img/" + SPUtil.getParam(this, SPUtil.USER_IMG, "")).into(userImage);
+        userName.setText((String) SPUtil.getParam(this, SPUtil.USER_NAME, ""));
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -91,15 +104,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(adapter);
-        List<Fragment> fragments = new ArrayList<>();
-        fragments.add(new QuestionFragment());
-        fragments.add(new LostFragment());
-        fragments.add(new IdleFragment());
-        fragments.add(new DeliveryFragment());
-        adapter.setList(fragments);
-
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -128,13 +132,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.nav_user:
+                    case R.id.my_homepage:
                         startActivity(new Intent(MainActivity.this, HomepageActivity.class));
                         break;
-                    case R.id.nav_collections:
-
+                    case R.id.my_questions:
+                        startActivity(new Intent(MainActivity.this, MyQuestionsActivity.class));
                         break;
-                    case R.id.nav_setup:
+                    case R.id.my_lost:
+                        startActivity(new Intent(MainActivity.this, MyLostActivity.class));
+                        break;
+                    case R.id.my_idle:
+                        startActivity(new Intent(MainActivity.this, MyIdleActivity.class));
+                        break;
+                    case R.id.my_delivery:
+                        startActivity(new Intent(MainActivity.this, MyDeliveryActivity.class));
+                        break;
+                    case R.id.my_collections:
+                        startActivity(new Intent(MainActivity.this, MyCollectionsActivity.class));
+                        break;
+                    case R.id.my_comments:
+                        startActivity(new Intent(MainActivity.this, MyViewPointActivity.class));
                         break;
                     default:
                         mDrawerLayout.closeDrawers();
@@ -142,6 +159,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(adapter);
+        List<Fragment> fragments = new ArrayList<>();
+        fragments.add(new QuestionFragment());
+        fragments.add(new LostFragment());
+        fragments.add(new IdleFragment());
+        fragments.add(new DeliveryFragment());
+        adapter.setList(fragments);
 
         Intent serviceIntent = new Intent(this, ChatService.class);
         startService(serviceIntent);
@@ -151,6 +177,12 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction("com.example.linxl.gduf_im.NEW_MESSAGE");
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(MyApplication.getContext());
         localBroadcastManager.registerReceiver(messageReceiver, intentFilter);
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu){

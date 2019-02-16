@@ -23,7 +23,8 @@
             <ImageView
                 android:id="@+id/user_background"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="@color/navHeader"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -202,6 +203,7 @@
         android:layout_margin="16dp"
         android:src="@drawable/ic_edit"
         app:layout_anchor="@id/appBar"
-        app:layout_anchorGravity="bottom|end"/>
+        app:layout_anchorGravity="bottom|end"
+        app:fabSize="mini"/>
 
 </android.support.design.widget.CoordinatorLayout>

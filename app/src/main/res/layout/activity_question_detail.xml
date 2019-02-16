@@ -109,7 +109,7 @@
             android:background="@color/toolbarBackground"/>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/question_comments"
+            android:id="@+id/view_point"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

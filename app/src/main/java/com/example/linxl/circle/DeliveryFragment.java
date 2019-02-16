@@ -41,13 +41,9 @@ public class DeliveryFragment extends Fragment {
     private List<DeliveryItem> allItems;
     private StaggeredGridLayoutManager layoutManager;
     private DeliveryAdapter adapter;
-    private String currentId = null;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
-
-    public DeliveryFragment() {
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,12 +59,14 @@ public class DeliveryFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
 
+        requestForDelivery();
+
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == adapter.getItemCount() && hasMore) {
-                    requestForIdle();
+                    requestForDelivery();
                 }
             }
 
@@ -86,11 +84,11 @@ public class DeliveryFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                currentId = null;
+                currentId = "0";
                 allItems.clear();
                 hasMore = true;
                 adapter.changeState(0);
-                requestForIdle();
+                requestForDelivery();
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -98,8 +96,8 @@ public class DeliveryFragment extends Fragment {
         return view;
     }
 
-    private void requestForIdle() {
-        String address = R.string.server_ip + "DeliveryServlet";
+    private void requestForDelivery() {
+        String address = getString(R.string.server_ip) + "deliveryServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("currentId", currentId)
                 .build();
@@ -131,7 +129,7 @@ public class DeliveryFragment extends Fragment {
                     }else {
                         Gson gson = new Gson();
                         items = gson.fromJson(responseData,
-                                new TypeToken<List<IdleItem>>(){}.getType());
+                                new TypeToken<List<DeliveryItem>>(){}.getType());
                         DeliveryItem item = items.get(items.size() - 1);
                         currentId = item.getDeliveryId();
                         allItems.addAll(items);

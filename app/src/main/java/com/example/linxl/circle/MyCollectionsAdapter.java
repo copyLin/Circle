@@ -1,6 +1,9 @@
 package com.example.linxl.circle;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,14 +13,22 @@ import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.CollectionItem;
+import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 
+import java.io.IOException;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created by Linxl on 2019/1/19.
@@ -76,10 +87,37 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_my_collection, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
             int position = holder.getAdapterPosition();
-            final CollectionItem item = mCollectionItems.get(position);
+            final CollectionItem collectionItem = mCollectionItems.get(position);
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Intent intent = null;
+                    switch (collectionItem.getLabel()){
+                        case "Question":
+                            intent = new Intent(mContext, QuestionDetailActivity.class);
+                            intent.putExtra("keyId", collectionItem.getKeyId());
+                            intent.putExtra("label", collectionItem.getLabel());
+                            break;
+                        case "Lost":
+                            intent = new Intent(mContext, LostDetailActivity.class);
+                            intent.putExtra("keyId", collectionItem.getKeyId());
+                            intent.putExtra("label", collectionItem.getLabel());
+                            break;
+                        case "Idle":
+                            intent = new Intent(mContext, IdleDetailActivity.class);
+                            intent.putExtra("keyId", collectionItem.getKeyId());
+                            intent.putExtra("label", collectionItem.getLabel());
+                            break;
+                        default:
+                            break;
+                    }
+                    mContext.startActivity(intent);
+                }
+            });
+
+            holder.mCardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
                     PopupMenu popupMenu = new PopupMenu(mContext,v);
                     popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
                     popupMenu.show();
@@ -87,15 +125,22 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()){
-                                case R.id.edit:
-                                    break;
                                 case R.id.delete:
-                                    break;
-                                case R.id.hide:
-                                    break;
-                                case R.id.like:
-                                    break;
-                                case R.id.report:
+                                    AlertDialog.Builder dialog1 = new AlertDialog.Builder(mContext);
+                                    dialog1.setMessage("删除后将无法恢复，点击确定删除");
+                                    dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            deleteMyCollection(collectionItem.getCollectionId());
+                                        }
+                                    });
+                                    dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    dialog1.show();
                                     break;
                                 default:
 
@@ -110,8 +155,11 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
                         }
                     });
 
-                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
-
+                    popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.open).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.like).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.report).setVisible(false);
+                    return false;
                 }
             });
             return holder;
@@ -169,5 +217,26 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void changeState(int state) {
         this.footer_state = state;
         notifyDataSetChanged();
+    }
+
+    private void deleteMyCollection(String id) {
+        String address = mContext.getResources().getString(R.string.server_ip) + "deleteCollectionServlet";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("id", id)
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(mContext, "操作失败", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+                    Toast.makeText(mContext, responseData, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

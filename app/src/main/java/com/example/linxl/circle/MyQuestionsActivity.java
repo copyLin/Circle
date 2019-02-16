@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.example.linxl.circle.gson.QuestionItem;
 import com.example.linxl.circle.utils.HttpUtil;
+import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,7 +30,7 @@ public class MyQuestionsActivity extends AppCompatActivity {
     private List<QuestionItem> allItems;
     private LinearLayoutManager layoutManager;
     private MyQuestionAdapter adapter;
-    private String currentId = null;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
 
@@ -65,8 +66,9 @@ public class MyQuestionsActivity extends AppCompatActivity {
     }
 
     private void requestForMyQuestion() {
-        String address = R.string.server_ip + "MyQuestionServlet";
+        String address = getString(R.string.server_ip) + "myQuestionServlet";
         RequestBody requestBody = new FormBody.Builder()
+                .add("userId", (String) SPUtil.getParam(this, SPUtil.USER_ID, ""))
                 .add("currentId", currentId)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {

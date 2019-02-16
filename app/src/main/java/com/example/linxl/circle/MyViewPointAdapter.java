@@ -1,30 +1,29 @@
 package com.example.linxl.circle;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.linxl.circle.gson.LostItem;
+import com.example.linxl.circle.gson.ViewPointItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 
 import java.io.IOException;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -32,10 +31,11 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * Created by Linxl on 2019/1/18.
+ * Created by Linxl on 2019/1/20.
  */
 
-public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class MyViewPointAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+
     static final int TYPE_NORMAL = 0;
     static final int TYPE_FOOTER = 1;
     static final int LOADING_MORE = 0;
@@ -43,31 +43,26 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private int footer_state = 0;
     private Context mContext;
-    private List<LostItem> mLostItems;
+    private List<ViewPointItem> mViewPointItems;
 
     private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
 
     class NormalViewHolder extends RecyclerView.ViewHolder{
 
         CardView mCardView;
-        ImageView mImageView;
-        TextView lostContent;
-        TextView eventTime;
-        TextView location;
-        TextView contact;
-        ImageButton moreButton;
+        CircleImageView mCircleImageView;
+        TextView tip;
+        TextView sendTime;
+        TextView content;
 
         public NormalViewHolder(View view){
             super(view);
             mCardView = (CardView) view;
-            mImageView = (ImageView) view.findViewById(R.id.lost_image);
-            lostContent = (TextView) view.findViewById(R.id.lost_content);
-            eventTime = (TextView) view.findViewById(R.id.lost_time);
-            location = (TextView) view.findViewById(R.id.lost_location);
-            contact = (TextView) view.findViewById(R.id.lost_contact);
-            moreButton = (ImageButton) view.findViewById(R.id.button_more);
+            mCircleImageView = (CircleImageView) view.findViewById(R.id.user_image);
+            tip = (TextView) view.findViewById(R.id.tip);
+            sendTime = (TextView) view.findViewById(R.id.send_time);
+            content = (TextView) view.findViewById(R.id.content);
         }
-
     }
 
     class FooterViewHolder extends RecyclerView.ViewHolder{
@@ -82,8 +77,8 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    public MyLostAdapter(List<LostItem> lostItems){
-        mLostItems = lostItems;
+    public MyViewPointAdapter(List<ViewPointItem> viewPointItems){
+        mViewPointItems = viewPointItems;
     }
 
     @Override
@@ -92,13 +87,40 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             mContext = parent.getContext();
         }
         if (viewType == TYPE_NORMAL){
-            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_my_lost, parent, false);
+            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_viewpoint_with_tip, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
             int position = holder.getAdapterPosition();
-            final LostItem lostItem = mLostItems.get(position);
-            holder.moreButton.setOnClickListener(new View.OnClickListener() {
+            final ViewPointItem viewPointItem = mViewPointItems.get(position);
+            holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Intent intent = null;
+                    switch (viewPointItem.getLabel()){
+                        case "Question":
+                            intent = new Intent(mContext, QuestionDetailActivity.class);
+                            intent.putExtra("keyId", viewPointItem.getKeyId());
+                            intent.putExtra("label", viewPointItem.getLabel());
+                            break;
+                        case "Lost":
+                            intent = new Intent(mContext, LostDetailActivity.class);
+                            intent.putExtra("keyId", viewPointItem.getKeyId());
+                            intent.putExtra("label", viewPointItem.getLabel());
+                            break;
+                        case "Idle":
+                            intent = new Intent(mContext, IdleDetailActivity.class);
+                            intent.putExtra("keyId", viewPointItem.getKeyId());
+                            intent.putExtra("label", viewPointItem.getLabel());
+                            break;
+                        default:
+                            break;
+                    }
+                    mContext.startActivity(intent);
+                }
+            });
+
+            holder.mCardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
                     PopupMenu popupMenu = new PopupMenu(mContext,v);
                     popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
                     popupMenu.show();
@@ -107,27 +129,21 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()){
                                 case R.id.delete:
-                                    AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-                                    dialog.setMessage("删除后将无法恢复，点击确定删除");
-                                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    AlertDialog.Builder dialog1 = new AlertDialog.Builder(mContext);
+                                    dialog1.setMessage("删除后将无法恢复，点击确定删除");
+                                    dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            deleteMyDelivery(lostItem.getUserId(), lostItem.getSendTime());
+                                            deleteMyViewPoint(viewPointItem.getViewPointId());
                                         }
                                     });
-                                    dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
                                         }
                                     });
-                                    dialog.show();
-                                    break;
-                                case R.id.hide:
-                                    break;
-                                case R.id.like:
-                                    break;
-                                case R.id.report:
+                                    dialog1.show();
                                     break;
                                 default:
 
@@ -141,38 +157,33 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
                         }
                     });
-                }
-            });
 
-            holder.mCardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(mContext, LostDetailActivity.class);
-                    intent.putExtra("keyId", lostItem.getLostId());
-                    intent.putExtra("label", "Lost");
-                    mContext.startActivity(intent);
+                    popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.open).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.like).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.report).setVisible(false);
+                    return false;
                 }
             });
 
             return holder;
-        } else if (viewType == TYPE_FOOTER){
+        }else if (viewType == TYPE_FOOTER){
             View view = LayoutInflater.from(mContext).inflate(R.layout.footer, parent, false);
             FooterViewHolder holder = new FooterViewHolder(view);
             return holder;
         }
         return null;
-
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
         if (holder instanceof NormalViewHolder){
-            LostItem lostItem = mLostItems.get(position);
-            ((NormalViewHolder) holder).lostContent.setText(lostItem.getContent());
-            ((NormalViewHolder) holder).eventTime.setText(lostItem.getEventTime());
-            ((NormalViewHolder) holder).location.setText(lostItem.getLocation());
-            ((NormalViewHolder) holder).contact.setText(lostItem.getContact());
-            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/" + lostItem.getUserId() + "/" + lostItem.getLostImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
+            ViewPointItem item = mViewPointItems.get(position);
+            ((NormalViewHolder) holder).tip.setText(item.getTip());
+            ((NormalViewHolder) holder).sendTime.setText(item.getSendTime());
+            ((NormalViewHolder) holder).content.setText(item.getContent());
+
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + item.getUserImg()).into(((NormalViewHolder) holder).mCircleImageView);
 
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {
@@ -190,24 +201,22 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     break;
             }
         }
-
     }
 
     @Override
-    public int getItemViewType(int position){
-        if (position == getItemCount() - 1 ){
+    public int getItemViewType(int positon){
+        if (positon == getItemCount() - 1) {
             return TYPE_FOOTER;
         }
         return TYPE_NORMAL;
-
     }
 
     @Override
     public int getItemCount(){
-        if (mLostItems != null){
-            return mLostItems.size() + 1;
+        if (mViewPointItems != null){
+            return mViewPointItems.size() + 1;
         }
-        return mLostItems.size();
+        return mViewPointItems.size();
     }
 
     public void changeState(int state) {
@@ -215,11 +224,10 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
-    private void deleteMyDelivery(String userId, String sendTime) {
-        String address = mContext.getResources().getString(R.string.server_ip) + "deleteLostServlet";
+    private void deleteMyViewPoint(String id) {
+        String address = mContext.getResources().getString(R.string.server_ip) + "deleteViewPointServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", id)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override

@@ -15,15 +15,19 @@ public class QuestionItem implements Serializable {
     private String userId;
     private String sendTime;
     private String content;
+    private boolean flag;
+    private int reportNum;
     private List<String> questionImgs;
 
-    public QuestionItem(String questionId, String userImg, String userName, String userId, String sendTime, String content, List<String> questionImgs) {
+    public QuestionItem(String questionId, String userImg, String userName, String userId, String sendTime, String content, boolean flag, int reportNum, List<String> questionImgs) {
         this.questionId = questionId;
         this.userImg = userImg;
         this.userName = userName;
         this.userId = userId;
         this.sendTime = sendTime;
         this.content = content;
+        this.flag = flag;
+        this.reportNum = reportNum;
         this.questionImgs = questionImgs;
     }
 
@@ -83,14 +87,34 @@ public class QuestionItem implements Serializable {
         this.questionImgs = questionImgs;
     }
 
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    public int getReportNum() {
+        return reportNum;
+    }
+
+    public void setReportNum(int reportNum) {
+        this.reportNum = reportNum;
+    }
+
     @Override
     public String toString() {
         return "QuestionItem{" +
-                "userImg='" + userImg + '\'' +
+                "questionId='" + questionId + '\'' +
+                ", userImg='" + userImg + '\'' +
                 ", userName='" + userName + '\'' +
                 ", userId='" + userId + '\'' +
                 ", sendTime='" + sendTime + '\'' +
                 ", content='" + content + '\'' +
+                ", flag=" + flag +
+                ", reportNum=" + reportNum +
+                ", questionImgs=" + questionImgs +
                 '}';
     }
 }

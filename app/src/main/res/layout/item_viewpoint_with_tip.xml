@@ -12,7 +12,7 @@
         android:layout_margin="12dp">
 
         <TextView
-            android:id="@+id/comment_tip"
+            android:id="@+id/tip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -38,13 +38,13 @@
                 android:layout_marginTop="8dp">
 
                 <TextView
-                    android:id="@+id/comment_time"
+                    android:id="@+id/send_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"/>
 
                 <TextView
-                    android:id="@+id/comment_content"
+                    android:id="@+id/content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"/>

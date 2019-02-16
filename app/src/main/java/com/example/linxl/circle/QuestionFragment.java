@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,18 +40,17 @@ public class QuestionFragment extends Fragment {
     private List<QuestionItem> allItems;
     private LinearLayoutManager layoutManager;
     private QuestionAdapter adapter;
-    private String currentId = null;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
-
-    public QuestionFragment() {
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_question, container, false);
+
+        Log.d("————QuesFragment————", "onCreate");
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
@@ -61,12 +61,14 @@ public class QuestionFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
 
+        requestForQuestion();
+
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == adapter.getItemCount() && hasMore) {
-                    requestForIdle();
+                    requestForQuestion();
                 }
             }
 
@@ -82,11 +84,11 @@ public class QuestionFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                currentId = null;
+                currentId = "0";
                 allItems.clear();
                 hasMore = true;
                 adapter.changeState(0);
-                requestForIdle();
+                requestForQuestion();
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -94,8 +96,8 @@ public class QuestionFragment extends Fragment {
         return view;
     }
 
-    private void requestForIdle() {
-        String address = R.string.server_ip + "QuestionServlet";
+    private void requestForQuestion() {
+        String address = getString(R.string.server_ip) + "questionServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("currentId", currentId)
                 .build();

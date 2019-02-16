@@ -80,11 +80,19 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_delivery, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
+            final int position = holder.getAdapterPosition();
+            final DeliveryItem item = mDeliveryItems.get(position);
+            holder.mCardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), UserCardActivity.class);
+                    intent.putExtra("userId", item.getUserId());
+                    mContext.startActivity(intent);
+                }
+            });
             holder.connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = holder.getAdapterPosition();
-                    DeliveryItem item = mDeliveryItems.get(position);
                     Intent intent = new Intent(view.getContext(), ChatActivity.class);
                     intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
                     intent.putExtra("toId", item.getUserId());

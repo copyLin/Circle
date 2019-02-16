@@ -39,7 +39,6 @@ public class LostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
         CardView mCardView;
         ImageView mImageView;
-        TextView label;
         TextView lostContent;
         TextView eventTime;
         TextView location;
@@ -51,7 +50,6 @@ public class LostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             super(view);
             mCardView = (CardView) view;
             mImageView = (ImageView) view.findViewById(R.id.lost_image);
-            label = (TextView) view.findViewById(R.id.lost_label);
             lostContent = (TextView) view.findViewById(R.id.lost_content);
             eventTime = (TextView) view.findViewById(R.id.lost_time);
             location = (TextView) view.findViewById(R.id.lost_location);
@@ -86,17 +84,31 @@ public class LostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_lost, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
+            int position = holder.getAdapterPosition();
+            final LostItem item = mLostItems.get(position);
+            holder.mCardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, LostDetailActivity.class);
+                    intent.putExtra("keyId", item.getLostId());
+                    intent.putExtra("label", "Lost");
+                    intent.putExtra("userId", item.getUserId());
+                    mContext.startActivity(intent);
+                }
+            });
             holder.commentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Intent intent = new Intent(mContext, LostDetailActivity.class);
+                    intent.putExtra("keyId", item.getLostId());
+                    intent.putExtra("label", "Lost");
+                    intent.putExtra("userId", item.getUserId());
+                    mContext.startActivity(intent);
                 }
             });
             holder.connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = holder.getAdapterPosition();
-                    LostItem item = mLostItems.get(position);
                     Intent intent = new Intent(view.getContext(), ChatActivity.class);
                     intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
                     intent.putExtra("toId", item.getUserId());
@@ -118,12 +130,11 @@ public class LostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
         if (holder instanceof NormalViewHolder){
             LostItem lostItem = mLostItems.get(position);
-            ((NormalViewHolder) holder).label.setText(lostItem.getLabel());
             ((NormalViewHolder) holder).lostContent.setText(lostItem.getContent());
             ((NormalViewHolder) holder).eventTime.setText(lostItem.getEventTime());
             ((NormalViewHolder) holder).location.setText(lostItem.getLocation());
             ((NormalViewHolder) holder).contact.setText(lostItem.getContact());
-            Glide.with(mContext).load(R.string.server_ip + "image/" + lostItem.getUserId() + "/" + lostItem.getLostImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/" + lostItem.getUserId() + "/" + lostItem.getLostImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
 
             if (lostItem.getUserId().equals(userId)) {
                 ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);

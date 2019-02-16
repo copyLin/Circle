@@ -2,10 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/edit"
-        android:icon="@drawable/ic_edit"
-        android:title="@string/menu_edit"/>
-    <item
         android:id="@+id/delete"
         android:icon="@drawable/ic_edit"
         android:title="@string/menu_delete"/>
@@ -13,6 +9,10 @@
         android:id="@+id/hide"
         android:icon="@drawable/ic_edit"
         android:title="@string/menu_hide"/>
+    <item
+        android:id="@+id/open"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/menu_open"/>
     <item
         android:id="@+id/like"
         android:icon="@drawable/ic_edit"

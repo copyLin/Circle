@@ -44,7 +44,7 @@
                 android:gravity="center">
 
                 <TextView
-                    android:id="@+id/comment_time"
+                    android:id="@+id/send_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#8f8f8f"
@@ -55,7 +55,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/comment_content"
+            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"

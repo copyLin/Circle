@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.example.linxl.circle.gson.IdleItem;
 import com.example.linxl.circle.utils.HttpUtil;
+import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,7 +30,7 @@ public class MyIdleActivity extends AppCompatActivity {
     private List<IdleItem> allItems;
     private LinearLayoutManager layoutManager;
     private MyIdleAdapter adapter;
-    private String currentId = null;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
 
@@ -65,8 +66,9 @@ public class MyIdleActivity extends AppCompatActivity {
     }
 
     private void requestForMyIdle() {
-        String address = R.string.server_ip + "MyIdleServlet";
+        String address = getString(R.string.server_ip) + "myIdleServlet";
         RequestBody requestBody = new FormBody.Builder()
+                .add("userId", (String) SPUtil.getParam(this, SPUtil.USER_ID, ""))
                 .add("currentId", currentId)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {

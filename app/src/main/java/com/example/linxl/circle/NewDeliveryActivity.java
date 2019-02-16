@@ -32,6 +32,7 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -43,11 +44,8 @@ public class NewDeliveryActivity extends AppCompatActivity {
     public static final int CHOOSE_PHOTO = 1;
     private ProgressBar mProgressBar;
     private EditText content;
-    private ImageButton addImgButton;
-    private RecyclerView mRecyclerView;
-    private List<String> imgPaths = new ArrayList<>();
-    private ImageAdapter mImageAdapter;
-    private ImageLoader mImageLoader;
+    private EditText price;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +55,7 @@ public class NewDeliveryActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
         content = (EditText) findViewById(R.id.delivery_content);
-        addImgButton = (ImageButton) findViewById(R.id.add_image);
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mImageLoader = new ImageLoader(this);
+        price = (EditText) findViewById(R.id.delivery_price);
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -68,33 +64,6 @@ public class NewDeliveryActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_cancel);
         }
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
-        mImageAdapter = new ImageAdapter(imgPaths);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setAdapter(mImageAdapter);
-
-        addImgButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String[] items = {"拍摄", "从相册选择"};
-                AlertDialog.Builder dialog = new AlertDialog.Builder(NewDeliveryActivity.this);
-                dialog.setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case 0:
-                                startActivityForResult(mImageLoader.takePhoto(), TAKE_PHOTO);
-                                break;
-                            case 1:
-                                startActivityForResult(mImageLoader.choosePhoto(), CHOOSE_PHOTO);
-                                break;
-                            default:
-                        }
-                    }
-                });
-
-            }
-        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu){
@@ -112,29 +81,18 @@ public class NewDeliveryActivity extends AppCompatActivity {
 
                 String userId = (String) SPUtil.getParam(this, SPUtil.USER_ID, "");
                 String deliveryContent = content.getText().toString();
+                String deliveryPrice = price.getText().toString();
                 String sendTime = TimeCapture.getChinaTime();
-
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSS");
-                String imgName = formatter.format(sendTime);
 
                 mProgressBar.setProgress(50);
 
-                MultipartBody.Builder multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
-                multipartBody.addFormDataPart("userId", userId);
-                multipartBody.addFormDataPart("content", deliveryContent);
-                multipartBody.addFormDataPart("sendTime", userId);
-                if (imgPaths != null) {
-                    int num = 0;
-                    for (String imagePath : imgPaths){
-                        num ++;
-                        File image = new File(imagePath);
-                        RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), image);
-                        multipartBody.addFormDataPart("image_" + num, "IMG_" + imgName + "_" + num + ".jpg", requestBody);
-                    }
-                }
-
-                RequestBody requestBody = multipartBody.build();
-                String address = R.string.server_ip + "NewQuestionServlet";
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("userId", userId)
+                        .add("content", deliveryContent)
+                        .add("price", deliveryPrice)
+                        .add("sendTime", sendTime)
+                        .build();
+                String address = getString(R.string.server_ip) + "newDeliveryServlet";
 
                 HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
                     @Override
@@ -169,37 +127,5 @@ public class NewDeliveryActivity extends AppCompatActivity {
                 break;
         }
         return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        switch (requestCode){
-            case TAKE_PHOTO:
-                if (resultCode == RESULT_OK){
-                    imgPaths.add(mImageLoader.handleTakenPhoto());
-                }
-                break;
-            case CHOOSE_PHOTO:
-                if (resultCode == RESULT_OK){
-                    if (Build.VERSION.SDK_INT >= 19){
-                        imgPaths.add(mImageLoader.handleImageOnKitKat(data));
-                    }else {
-                        imgPaths.add(mImageLoader.handleImageBeforeKitKat(data));
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(imgPaths.size()>=9){
-            addImgButton.setBackgroundResource(R.drawable.ic_add_img_unable);
-            addImgButton.setEnabled(false);
-        }
-        mRecyclerView.setAdapter(mImageAdapter);
     }
 }

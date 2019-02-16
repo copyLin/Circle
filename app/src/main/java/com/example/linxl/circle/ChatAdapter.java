@@ -80,10 +80,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ChatItem item = mChatItems.get(position);
         if (holder instanceof LeftViewHolder) {
-            Glide.with(mContext).load(R.string.server_ip + "user_img/" + contactImg).into(((LeftViewHolder) holder).userImg);
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "user_img/" + contactImg).into(((LeftViewHolder) holder).userImg);
             ((LeftViewHolder) holder).content.setText(item.getContent());
         }else if (holder instanceof RightViewHolder) {
-            Glide.with(mContext).load(R.string.server_ip + "user_img/" + userImg).into(((RightViewHolder) holder).userImg);
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "user_img/" + userImg).into(((RightViewHolder) holder).userImg);
             ((RightViewHolder) holder).content.setText(item.getContent());
         }
     }

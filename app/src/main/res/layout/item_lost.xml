@@ -21,13 +21,6 @@
             android:layout_gravity="center_horizontal"/>
 
         <TextView
-            android:id="@+id/lost_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:textSize="14sp"/>
-
-        <TextView
             android:id="@+id/lost_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

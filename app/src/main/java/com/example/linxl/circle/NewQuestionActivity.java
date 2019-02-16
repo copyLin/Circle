@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.example.linxl.circle.utils.TimeCapture;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +78,7 @@ public class NewQuestionActivity extends AppCompatActivity {
         addImgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("—————— NewQuestion ————", "click the button");
                 final String[] items = {"拍摄", "从相册选择"};
                 AlertDialog.Builder dialog = new AlertDialog.Builder(NewQuestionActivity.this);
                 dialog.setItems(items, new DialogInterface.OnClickListener() {
@@ -92,6 +95,7 @@ public class NewQuestionActivity extends AppCompatActivity {
                         }
                     }
                 });
+                dialog.show();
 
             }
         });
@@ -115,10 +119,14 @@ public class NewQuestionActivity extends AppCompatActivity {
                 String questionContent = content.getText().toString();
                 String sendTime = TimeCapture.getChinaTime();
 
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSS");
-                String imgName = formatter.format(sendTime);
-
-                mProgressBar.setProgress(50);
+                SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat formatter2 = new SimpleDateFormat("yyyyMMddHHmmssSS");
+                String imgName = null;
+                try {
+                    imgName = formatter2.format(formatter1.parse(sendTime));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
                 MultipartBody.Builder multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
                 multipartBody.addFormDataPart("userId", userId);
@@ -135,7 +143,9 @@ public class NewQuestionActivity extends AppCompatActivity {
                 }
 
                 RequestBody requestBody = multipartBody.build();
-                String address = R.string.server_ip + "NewQuestionServlet";
+                String address = getString(R.string.server_ip) + "newQuestionServlet";
+
+                mProgressBar.setProgress(90);
 
                 HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
                     @Override

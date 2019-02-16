@@ -1,12 +1,13 @@
 package com.example.linxl.circle.gson;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Linxl on 2018/11/24.
  */
 
-public class IdleItem {
+public class IdleItem implements Serializable {
 
     private String idleId;
     private String userImg;
@@ -16,9 +17,11 @@ public class IdleItem {
     private String content;
     private String idleName;
     private String price;
+    private boolean flag;
+    private int reportNum;
     private List<String> idleImgs;
 
-    public IdleItem(String idleId, String userImg, String userName, String userId, String sendTime, String content, String idleName, String price, List<String> idleImgs) {
+    public IdleItem(String idleId, String userImg, String userName, String userId, String sendTime, String content, String idleName, String price, boolean flag, int reportNum, List<String> idleImgs) {
         this.idleId = idleId;
         this.userImg = userImg;
         this.userName = userName;
@@ -27,6 +30,8 @@ public class IdleItem {
         this.content = content;
         this.idleName = idleName;
         this.price = price;
+        this.flag = flag;
+        this.reportNum = reportNum;
         this.idleImgs = idleImgs;
     }
 
@@ -102,16 +107,36 @@ public class IdleItem {
         this.idleImgs = idleImgs;
     }
 
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    public int getReportNum() {
+        return reportNum;
+    }
+
+    public void setReportNum(int reportNum) {
+        this.reportNum = reportNum;
+    }
+
     @Override
     public String toString() {
         return "IdleItem{" +
-                "userImg='" + userImg + '\'' +
+                "idleId='" + idleId + '\'' +
+                ", userImg='" + userImg + '\'' +
                 ", userName='" + userName + '\'' +
                 ", userId='" + userId + '\'' +
                 ", sendTime='" + sendTime + '\'' +
                 ", content='" + content + '\'' +
                 ", idleName='" + idleName + '\'' +
                 ", price='" + price + '\'' +
+                ", flag=" + flag +
+                ", reportNum=" + reportNum +
+                ", idleImgs=" + idleImgs +
                 '}';
     }
 }

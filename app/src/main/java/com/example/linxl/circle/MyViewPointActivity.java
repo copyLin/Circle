@@ -6,8 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.example.linxl.circle.gson.CommentItem;
+import com.example.linxl.circle.gson.ViewPointItem;
 import com.example.linxl.circle.utils.HttpUtil;
+import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -21,27 +22,27 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MyCommentActivity extends AppCompatActivity {
+public class MyViewPointActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
 
-    private List<CommentItem> items;
-    private List<CommentItem> allItems;
+    private List<ViewPointItem> items;
+    private List<ViewPointItem> allItems;
     private LinearLayoutManager layoutManager;
-    private NewCommentAdapter adapter;
-    private String currentId = null;
+    private MyViewPointAdapter adapter;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_comment);
+        setContentView(R.layout.activity_my_viewpoint);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         allItems = new ArrayList<>();
         layoutManager = new LinearLayoutManager(this);
-        adapter = new NewCommentAdapter(allItems);
+        adapter = new MyViewPointAdapter(allItems);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
@@ -51,7 +52,7 @@ public class MyCommentActivity extends AppCompatActivity {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == adapter.getItemCount() && hasMore) {
-                    requestForMyQuestion();
+                    requestForMyViewPoint();
                 }
             }
 
@@ -64,9 +65,10 @@ public class MyCommentActivity extends AppCompatActivity {
         });
     }
 
-    private void requestForMyQuestion() {
-        String address = R.string.server_ip + "CommentServlet";
+    private void requestForMyViewPoint() {
+        String address = getString(R.string.server_ip) + "myViewPointServlet";
         RequestBody requestBody = new FormBody.Builder()
+                .add("userId", (String) SPUtil.getParam(this, SPUtil.USER_ID, ""))
                 .add("currentId", currentId)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -75,7 +77,7 @@ public class MyCommentActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(MyCommentActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MyViewPointActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -97,9 +99,9 @@ public class MyCommentActivity extends AppCompatActivity {
                     }else {
                         Gson gson = new Gson();
                         items = gson.fromJson(responseData,
-                                new TypeToken<List<CommentItem>>(){}.getType());
-                        CommentItem item = items.get(items.size() - 1);
-                        currentId = item.getCommentId();
+                                new TypeToken<List<ViewPointItem>>(){}.getType());
+                        ViewPointItem item = items.get(items.size() - 1);
+                        currentId = item.getKeyId();
                         allItems.addAll(items);
                         runOnUiThread(new Runnable() {
                             @Override

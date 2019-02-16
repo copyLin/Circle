@@ -1,6 +1,7 @@
 package com.example.linxl.circle;
 
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -23,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.linxl.circle.utils.HttpUtil;
@@ -32,6 +34,7 @@ import com.example.linxl.circle.utils.TimeCapture;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,9 +52,8 @@ public class NewLostActivity extends AppCompatActivity {
     public static final int TAKE_PHOTO = 0;
     public static final int CHOOSE_PHOTO = 1;
     private ProgressBar mProgressBar;
-    private Spinner label;
     private TextView date;
-    private Spinner time;
+    private TextView time;
     private EditText location;
     private EditText contact;
     private EditText content;
@@ -60,6 +62,7 @@ public class NewLostActivity extends AppCompatActivity {
     private List<String> imgPaths = new ArrayList<>();
     private ImageAdapter mImageAdapter;
     private ImageLoader mImageLoader;
+    private Calendar calendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +71,8 @@ public class NewLostActivity extends AppCompatActivity {
         ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        label = (Spinner) findViewById(R.id.lost_label);
         date = (TextView) findViewById(R.id.lost_date);
-        time = (Spinner) findViewById(R.id.lost_time);
+        time = (TextView) findViewById(R.id.lost_time);
         location = (EditText) findViewById(R.id.lost_location);
         contact = (EditText) findViewById(R.id.lost_contact);
         content = (EditText) findViewById(R.id.lost_content);
@@ -78,17 +80,9 @@ public class NewLostActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mImageLoader = new ImageLoader(this);
 
-        String[] labelItems = getResources().getStringArray(R.array.label_spinner);
-        String[] timeItems = getResources().getStringArray(R.array.time_spinner);
-        ArrayAdapter<String> labelAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labelItems);
-        ArrayAdapter<String> timeAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, timeItems);
-        label.setAdapter(labelAdapter);
-        time.setAdapter(timeAdapter);
-
         date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
                 int y = calendar.get(Calendar.YEAR);
                 int m = calendar.get(Calendar.MONTH);
                 int d = calendar.get(Calendar.DAY_OF_MONTH);
@@ -96,9 +90,24 @@ public class NewLostActivity extends AppCompatActivity {
                 new DatePickerDialog(NewLostActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        date.setText(year + "年" + month + "月" + dayOfMonth + "日");
+                        date.setText(year + "-" + month + "-" + dayOfMonth);
                     }
                 }, y,m,d).show();
+            }
+        });
+
+        time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int h = calendar.get(Calendar.HOUR);
+                int m = calendar.get(Calendar.MINUTE);
+
+                new TimePickerDialog(NewLostActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        time.setText(hourOfDay + ":" + minute);
+                    }
+                }, h, m, true).show();
             }
         });
 
@@ -133,6 +142,7 @@ public class NewLostActivity extends AppCompatActivity {
                         }
                     }
                 });
+                dialog.show();
 
             }
         });
@@ -153,41 +163,31 @@ public class NewLostActivity extends AppCompatActivity {
 
                 String userId = (String) SPUtil.getParam(this, SPUtil.USER_ID, "");
                 String lostContent = content.getText().toString();
+                String lostLocation = location.getText().toString();
+                String lostContact = contact.getText().toString();
                 String sendTime = TimeCapture.getChinaTime();
                 String lostDate = date.getText().toString();
+                String lostTime = time.getText().toString();
+                String eventTime = lostDate + " " + lostTime + ":00";
 
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSS");
-                String imgName = formatter.format(sendTime);
+                SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat formatter2 = new SimpleDateFormat("yyyyMMddHHmmssSS");
+                String imgName = null;
+                try {
+                    imgName = formatter2.format(formatter1.parse(sendTime));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
                 mProgressBar.setProgress(50);
 
                 final MultipartBody.Builder multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
                 multipartBody.addFormDataPart("userId", userId);
                 multipartBody.addFormDataPart("content", lostContent);
-                multipartBody.addFormDataPart("sendTime", userId);
-                multipartBody.addFormDataPart("date", lostDate);
-                label.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        multipartBody.addFormDataPart("label", parent.getItemAtPosition(position).toString());                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-
-                time.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        multipartBody.addFormDataPart("time", parent.getItemAtPosition(position).toString());
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
+                multipartBody.addFormDataPart("location", lostLocation);
+                multipartBody.addFormDataPart("contact", lostContact);
+                multipartBody.addFormDataPart("sendTime", sendTime);
+                multipartBody.addFormDataPart("eventTime", eventTime);
 
                 if (imgPaths != null) {
                     int num = 0;
@@ -200,7 +200,7 @@ public class NewLostActivity extends AppCompatActivity {
                 }
 
                 RequestBody requestBody = multipartBody.build();
-                String address = R.string.server_ip + "NewQuestionServlet";
+                String address = getString(R.string.server_ip) + "newLostServlet";
 
                 HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
                     @Override

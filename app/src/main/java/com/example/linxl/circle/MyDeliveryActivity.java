@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.example.linxl.circle.gson.DeliveryItem;
 import com.example.linxl.circle.utils.HttpUtil;
+import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,7 +30,7 @@ public class MyDeliveryActivity extends AppCompatActivity {
     private List<DeliveryItem> allItems;
     private StaggeredGridLayoutManager layoutManager;
     private MyDeliveryAdapter adapter;
-    private String currentId = null;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
 
@@ -67,8 +68,9 @@ public class MyDeliveryActivity extends AppCompatActivity {
     }
 
     private void requestForMyDelivery() {
-        String address = R.string.server_ip + "MyDeliveryServlet";
+        String address = getString(R.string.server_ip) + "myDeliveryServlet";
         RequestBody requestBody = new FormBody.Builder()
+                .add("userId", (String) SPUtil.getParam(this, SPUtil.USER_ID, ""))
                 .add("currentId", currentId)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {

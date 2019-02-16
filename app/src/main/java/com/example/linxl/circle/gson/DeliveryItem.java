@@ -1,10 +1,12 @@
 package com.example.linxl.circle.gson;
 
+import java.io.Serializable;
+
 /**
  * Created by Linxl on 2018/11/24.
  */
 
-public class DeliveryItem {
+public class DeliveryItem implements Serializable {
 
     private String deliveryId;
     private String userImg;
@@ -13,8 +15,10 @@ public class DeliveryItem {
     private String sendTime;
     private String content;
     private String price;
+    private boolean flag;
+    private int reportNum;
 
-    public DeliveryItem(String deliveryId, String userImg, String userName, String userId, String sendTime, String content, String price) {
+    public DeliveryItem(String deliveryId, String userImg, String userName, String userId, String sendTime, String content, String price, boolean flag, int reportNum) {
         this.deliveryId = deliveryId;
         this.userImg = userImg;
         this.userName = userName;
@@ -22,6 +26,8 @@ public class DeliveryItem {
         this.sendTime = sendTime;
         this.content = content;
         this.price = price;
+        this.flag = flag;
+        this.reportNum = reportNum;
     }
 
     public String getDeliveryId() {
@@ -80,15 +86,34 @@ public class DeliveryItem {
         this.price = price;
     }
 
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    public int getReportNum() {
+        return reportNum;
+    }
+
+    public void setReportNum(int reportNum) {
+        this.reportNum = reportNum;
+    }
+
     @Override
     public String toString() {
         return "DeliveryItem{" +
-                "userImg='" + userImg + '\'' +
+                "deliveryId='" + deliveryId + '\'' +
+                ", userImg='" + userImg + '\'' +
                 ", userName='" + userName + '\'' +
                 ", userId='" + userId + '\'' +
                 ", sendTime='" + sendTime + '\'' +
                 ", content='" + content + '\'' +
                 ", price='" + price + '\'' +
+                ", flag=" + flag +
+                ", reportNum=" + reportNum +
                 '}';
     }
 }

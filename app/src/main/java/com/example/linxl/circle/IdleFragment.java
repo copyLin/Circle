@@ -40,13 +40,9 @@ public class IdleFragment extends Fragment {
     private List<IdleItem> allItems;
     private LinearLayoutManager layoutManager;
     private IdleAdapter adapter;
-    private String currentId = null;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
-
-    public IdleFragment() {
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +57,8 @@ public class IdleFragment extends Fragment {
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
+
+        requestForIdle();
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -83,7 +81,7 @@ public class IdleFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                currentId = null;
+                currentId = "0";
                 allItems.clear();
                 hasMore = true;
                 adapter.changeState(0);
@@ -96,7 +94,7 @@ public class IdleFragment extends Fragment {
     }
 
     private void requestForIdle() {
-        String address = R.string.server_ip + "IdleServlet";
+        String address = getString(R.string.server_ip) + "idleServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("currentId", currentId)
                 .build();

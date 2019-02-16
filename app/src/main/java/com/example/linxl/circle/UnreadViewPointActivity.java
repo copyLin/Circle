@@ -6,8 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.example.linxl.circle.gson.CommentItem;
+import com.example.linxl.circle.gson.ViewPointItem;
 import com.example.linxl.circle.utils.HttpUtil;
+import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -21,53 +22,31 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class NewCommentActivity extends AppCompatActivity {
+public class UnreadViewPointActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
 
-    private List<CommentItem> items;
-    private List<CommentItem> allItems;
+    private List<ViewPointItem> items;
+    private List<ViewPointItem> allItems;
     private LinearLayoutManager layoutManager;
-    private NewCommentAdapter adapter;
-    private String currentId = null;
-    private boolean hasMore = true;
-    private int lastVisibleItem;
+    private UnreadViewPointAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_comment);
+        setContentView(R.layout.activity_unread_viewpoint);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         allItems = new ArrayList<>();
         layoutManager = new LinearLayoutManager(this);
-        adapter = new NewCommentAdapter(allItems);
+        adapter = new UnreadViewPointAdapter(allItems);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
 
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == adapter.getItemCount() && hasMore) {
-                    requestForMyQuestion();
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                lastVisibleItem = layoutManager.findLastVisibleItemPosition();
-            }
-
-        });
-    }
-
-    private void requestForMyQuestion() {
-        String address = R.string.server_ip + "CommentServlet";
+        String address = getString(R.string.server_ip) + "unreadViewPoint";
         RequestBody requestBody = new FormBody.Builder()
-                .add("currentId", currentId)
+                .add("toId", (String) SPUtil.getParam(this, SPUtil.USER_ID, ""))
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -75,7 +54,7 @@ public class NewCommentActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(NewCommentActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UnreadViewPointActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -85,21 +64,18 @@ public class NewCommentActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     final String responseData = response.body().string();
 
-                    if (responseData.equals("NoMoreData")){
+                    if (responseData.equals("NoData")){
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                hasMore = false;
-                                adapter.changeState(1);
+                                Toast.makeText(UnreadViewPointActivity.this, "无未读消息", Toast.LENGTH_SHORT).show();
                             }
                         });
 
                     }else {
                         Gson gson = new Gson();
                         items = gson.fromJson(responseData,
-                                new TypeToken<List<CommentItem>>(){}.getType());
-                        CommentItem item = items.get(items.size() - 1);
-                        currentId = item.getCommentId();
+                                new TypeToken<List<ViewPointItem>>(){}.getType());
                         allItems.addAll(items);
                         runOnUiThread(new Runnable() {
                             @Override
@@ -114,4 +90,5 @@ public class NewCommentActivity extends AppCompatActivity {
             }
         });
     }
+
 }

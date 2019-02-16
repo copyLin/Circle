@@ -10,7 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.linxl.circle.gson.CommentItem;
+import com.example.linxl.circle.gson.ViewPointItem;
 import com.example.linxl.circle.utils.SPUtil;
 
 import java.util.List;
@@ -21,8 +21,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by Linxl on 2019/1/20.
  */
 
-public class MyCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
-
+public class UnreadViewPointAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     static final int TYPE_NORMAL = 0;
     static final int TYPE_FOOTER = 1;
     static final int LOADING_MORE = 0;
@@ -30,7 +29,7 @@ public class MyCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private int footer_state = 0;
     private Context mContext;
-    private List<CommentItem> mCommentItems;
+    private List<ViewPointItem> mViewPointItems;
 
     private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
 
@@ -38,17 +37,17 @@ public class MyCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         CardView mCardView;
         CircleImageView mCircleImageView;
-        TextView commentTip;
-        TextView commentTime;
-        TextView commentContent;
+        TextView tip;
+        TextView sendTime;
+        TextView content;
 
         public NormalViewHolder(View view){
             super(view);
             mCardView = (CardView) view;
             mCircleImageView = (CircleImageView) view.findViewById(R.id.user_image);
-            commentTip = (TextView) view.findViewById(R.id.comment_tip);
-            commentTime = (TextView) view.findViewById(R.id.comment_time);
-            commentContent = (TextView) view.findViewById(R.id.comment_content);
+            tip = (TextView) view.findViewById(R.id.tip);
+            sendTime = (TextView) view.findViewById(R.id.send_time);
+            content = (TextView) view.findViewById(R.id.content);
         }
     }
 
@@ -64,8 +63,8 @@ public class MyCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public MyCommentAdapter(List<CommentItem> commentItems){
-        mCommentItems = commentItems;
+    public UnreadViewPointAdapter(List<ViewPointItem> viewPointItems){
+        mViewPointItems = viewPointItems;
     }
 
     @Override
@@ -74,10 +73,10 @@ public class MyCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             mContext = parent.getContext();
         }
         if (viewType == TYPE_NORMAL){
-            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_comment_with_tip, parent, false);
+            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_viewpoint_with_tip, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
             int position = holder.getAdapterPosition();
-            final CommentItem item = mCommentItems.get(position);
+            final ViewPointItem item = mViewPointItems.get(position);
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -96,12 +95,12 @@ public class MyCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
         if (holder instanceof NormalViewHolder){
-            CommentItem commentItem = mCommentItems.get(position);
-            ((NormalViewHolder) holder).commentTip.setText(commentItem.getCommentTip());
-            ((NormalViewHolder) holder).commentTime.setText(commentItem.getCommentTime());
-            ((NormalViewHolder) holder).commentContent.setText(commentItem.getCommentContent());
+            ViewPointItem item = mViewPointItems.get(position);
+            ((NormalViewHolder) holder).tip.setText(item.getTip());
+            ((NormalViewHolder) holder).sendTime.setText(item.getSendTime());
+            ((NormalViewHolder) holder).content.setText(item.getContent());
 
-            Glide.with(mContext).load(R.string.server_ip + "image/user_img/" + commentItem.getUserImg()).into(((NormalViewHolder) holder).mCircleImageView);
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + item.getUserImg()).into(((NormalViewHolder) holder).mCircleImageView);
 
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {
@@ -131,10 +130,10 @@ public class MyCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemCount(){
-        if (mCommentItems != null){
-            return mCommentItems.size() + 1;
+        if (mViewPointItems != null){
+            return mViewPointItems.size() + 1;
         }
-        return mCommentItems.size();
+        return mViewPointItems.size();
     }
 
     public void changeState(int state) {

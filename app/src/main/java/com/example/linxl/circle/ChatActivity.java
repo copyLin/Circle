@@ -56,7 +56,7 @@ public class ChatActivity extends AppCompatActivity {
     private String fromId;
     private String toId;
     private String contactImg;
-    private String currentId;
+    private String currentId = "0";
     private int firstVisibleItem;
     private boolean hasMore = true;
 
@@ -153,7 +153,7 @@ public class ChatActivity extends AppCompatActivity {
                 .add("toId", String.valueOf(toId))
                 .build();
 
-        String address = R.string.server_ip + "chatRecordServlet";
+        String address = getString(R.string.server_ip) + "chatRecordServlet";
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -224,13 +224,13 @@ public class ChatActivity extends AppCompatActivity {
     class ChatReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent){
-            ChatItem item = (ChatItem) intent.getSerializableExtra("new");
+            ChatItem item = (ChatItem) intent.getSerializableExtra("new_msg");
             if (item.getFromId().equals(fromId) || item.getFromId().equals(toId)) {
                 mChatItems.add(item);
                 mRecyclerView.scrollToPosition(mChatItems.size()-1);
                 mChatAdapter.notifyDataSetChanged();
-                item.setFlag(true);
-                item.save();
+                //item.setFlag(true);
+                //item.save();
             }
 
         }

@@ -26,6 +26,7 @@ import com.example.linxl.circle.utils.TimeCapture;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +97,7 @@ public class NewIdleActivity extends AppCompatActivity {
                         }
                     }
                 });
+                dialog.show();
 
             }
         });
@@ -120,8 +122,14 @@ public class NewIdleActivity extends AppCompatActivity {
                 String idleContent = content.getText().toString();
                 String sendTime = TimeCapture.getChinaTime();
 
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmssSS");
-                String imgName = formatter.format(sendTime);
+                SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat formatter2 = new SimpleDateFormat("yyyyMMddHHmmssSS");
+                String imgName = null;
+                try {
+                    imgName = formatter2.format(formatter1.parse(sendTime));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
                 mProgressBar.setProgress(50);
 
@@ -142,7 +150,7 @@ public class NewIdleActivity extends AppCompatActivity {
                 }
 
                 RequestBody requestBody = multipartBody.build();
-                String address = R.string.server_ip + "NewQuestionServlet";
+                String address = getString(R.string.server_ip) + "newIdleServlet";
 
                 HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
                     @Override

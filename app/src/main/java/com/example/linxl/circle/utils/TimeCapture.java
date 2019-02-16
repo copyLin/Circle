@@ -13,7 +13,7 @@ public class TimeCapture {
     static SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static String getChinaTime(){
-        TimeZone mTimeZone = TimeZone.getTimeZone("GTM+8:00");
+        TimeZone mTimeZone = TimeZone.getTimeZone("GMT+8");
         mSimpleDateFormat.setTimeZone(mTimeZone);
         return mSimpleDateFormat.format(Calendar.getInstance().getTime());
     }

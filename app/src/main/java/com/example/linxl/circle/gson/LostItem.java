@@ -1,12 +1,13 @@
 package com.example.linxl.circle.gson;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Linxl on 2018/11/24.
  */
 
-public class LostItem {
+public class LostItem implements Serializable {
 
     private String lostId;
     private String userImg;
@@ -14,24 +15,26 @@ public class LostItem {
     private String userId;
     private String sendTime;
     private String content;
-    private String label;
     private String eventTime;
     private String location;
     private String contact;
-    private List<String> LostImgs;
+    private boolean flag;
+    private int reportNum;
+    private List<String> lostImgs;
 
-    public LostItem(String lostId, String userImg, String userName, String userId, String sendTime, String content, String label, String eventTime, String location, String contact, List<String> lostImgs) {
+    public LostItem(String lostId, String userImg, String userName, String userId, String sendTime, String content, String eventTime, String location, String contact, boolean flag, int reportNum, List<String> lostImgs) {
         this.lostId = lostId;
         this.userImg = userImg;
         this.userName = userName;
         this.userId = userId;
         this.sendTime = sendTime;
         this.content = content;
-        this.label = label;
         this.eventTime = eventTime;
         this.location = location;
         this.contact = contact;
-        LostImgs = lostImgs;
+        this.flag = flag;
+        this.reportNum = reportNum;
+        this.lostImgs = lostImgs;
     }
 
     public String getLostId() {
@@ -82,14 +85,6 @@ public class LostItem {
         this.content = content;
     }
 
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
     public String getEventTime() {
         return eventTime;
     }
@@ -114,26 +109,45 @@ public class LostItem {
         this.contact = contact;
     }
 
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    public int getReportNum() {
+        return reportNum;
+    }
+
+    public void setReportNum(int reportNum) {
+        this.reportNum = reportNum;
+    }
+
     public List<String> getLostImgs() {
-        return LostImgs;
+        return lostImgs;
     }
 
     public void setLostImgs(List<String> lostImgs) {
-        LostImgs = lostImgs;
+        this.lostImgs = lostImgs;
     }
 
     @Override
     public String toString() {
         return "LostItem{" +
-                "userImg='" + userImg + '\'' +
+                "lostId='" + lostId + '\'' +
+                ", userImg='" + userImg + '\'' +
                 ", userName='" + userName + '\'' +
                 ", userId='" + userId + '\'' +
                 ", sendTime='" + sendTime + '\'' +
                 ", content='" + content + '\'' +
-                ", label='" + label + '\'' +
                 ", eventTime='" + eventTime + '\'' +
                 ", location='" + location + '\'' +
                 ", contact='" + contact + '\'' +
+                ", flag=" + flag +
+                ", reportNum=" + reportNum +
+                ", lostImgs=" + lostImgs +
                 '}';
     }
 }

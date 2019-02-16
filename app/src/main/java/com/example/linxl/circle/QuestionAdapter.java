@@ -88,11 +88,23 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final NormalViewHolder holder = new NormalViewHolder(view);
             int position = holder.getAdapterPosition();
             final QuestionItem item = mQuestionItems.get(position);
+            holder.mCardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, QuestionDetailActivity.class);
+                    intent.putExtra("keyId", item.getQuestionId());
+                    intent.putExtra("label", "Question");
+                    intent.putExtra("userId", item.getUserId());
+                    mContext.startActivity(intent);
+                }
+            });
             holder.commentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(mContext, QuestionDetailActivity.class);
-                    intent.putExtra("item", item);
+                    intent.putExtra("keyId", item.getQuestionId());
+                    intent.putExtra("label", "Question");
+                    intent.putExtra("userId", item.getUserId());
                     mContext.startActivity(intent);
                 }
             });
@@ -123,12 +135,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((NormalViewHolder) holder).sendTime.setText(questionItem.getSendTime());
             ((NormalViewHolder) holder).questionContent.setText(questionItem.getContent());
 
-            Glide.with(mContext).load(R.string.server_ip + "image/user_img/" + questionItem.getUserImg()).into(((NormalViewHolder) holder).mCircleImageView);
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + questionItem.getUserImg()).into(((NormalViewHolder) holder).mCircleImageView);
 
             if (questionItem.getQuestionImgs() != null){
                 List<String> imgPaths = new ArrayList<>();
                 for (String imgPath : questionItem.getQuestionImgs()){
-                    imgPaths.add(R.string.server_ip + "image/" + questionItem.getUserId() + "/" + imgPath);
+                    imgPaths.add(mContext.getResources().getString(R.string.server_ip) + "image/" + questionItem.getUserId() + "/" + imgPath);
                 }
                 GridLayoutManager layoutManager = new GridLayoutManager(mContext, 3);
                 ImageAdapter adapter = new ImageAdapter(imgPaths);

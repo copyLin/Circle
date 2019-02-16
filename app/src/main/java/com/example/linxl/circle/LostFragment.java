@@ -41,13 +41,9 @@ public class LostFragment extends Fragment {
     private List<LostItem> allItems;
     private StaggeredGridLayoutManager layoutManager;
     private LostAdapter adapter;
-    private String currentId = null;
+    private String currentId = "0";
     private boolean hasMore = true;
     private int lastVisibleItem;
-
-    public LostFragment() {
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,12 +59,14 @@ public class LostFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
 
+        requestForLost();
+
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == adapter.getItemCount() && hasMore) {
-                    requestForIdle();
+                    requestForLost();
                 }
             }
 
@@ -86,11 +84,11 @@ public class LostFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                currentId = null;
+                currentId = "0";
                 allItems.clear();
                 hasMore = true;
                 adapter.changeState(0);
-                requestForIdle();
+                requestForLost();
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -98,8 +96,8 @@ public class LostFragment extends Fragment {
         return view;
     }
 
-    private void requestForIdle() {
-        String address = R.string.server_ip + "LostServlet";
+    private void requestForLost() {
+        String address = getString(R.string.server_ip) + "lostServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("currentId", currentId)
                 .build();
@@ -131,7 +129,7 @@ public class LostFragment extends Fragment {
                     }else {
                         Gson gson = new Gson();
                         items = gson.fromJson(responseData,
-                                new TypeToken<List<IdleItem>>(){}.getType());
+                                new TypeToken<List<LostItem>>(){}.getType());
                         LostItem item = items.get(items.size() - 1);
                         currentId = item.getLostId();
                         allItems.addAll(items);

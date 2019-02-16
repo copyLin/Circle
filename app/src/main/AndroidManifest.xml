@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,8 +27,8 @@
         <activity android:name=".NewDeliveryActivity" />
         <activity android:name=".ContactsActivity" />
         <activity android:name=".HomepageActivity" />
-        <activity android:name=".WelcomeActivity" />
         <activity android:name=".LoginActivity" />
+        <activity android:name=".MainActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -55,8 +55,8 @@
         <activity android:name=".MyIdleActivity" />
         <activity android:name=".MyDeliveryActivity" />
         <activity android:name=".MyCollectionsActivity" />
-        <activity android:name=".NewCommentActivity" />
-        <activity android:name=".MyCommentActivity" />
+        <activity android:name=".UnreadViewPointActivity" />
+        <activity android:name=".MyViewPointActivity" />
         <activity android:name=".UserCardActivity" />
         <activity android:name=".SearchResultActivity"></activity>
     </application>

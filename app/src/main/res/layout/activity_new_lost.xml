@@ -49,32 +49,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/lost_label"
-                    android:textSize="16sp"/>
-
-                <Spinner
-                    android:id="@+id/lost_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:entries="@array/label_spinner"/>
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="wrap_content"
-                android:layout_height="0.5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:background="@color/navHeader"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="@string/lost_time"
                     android:textSize="16sp"/>
 
@@ -86,11 +60,13 @@
                     android:textSize="16sp"
                     android:hint="@string/data_hint"/>
 
-                <Spinner
+                <TextView
                     android:id="@+id/lost_time"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:entries="@array/time_spinner"/>
+                    android:layout_weight="1"
+                    android:textSize="16sp"
+                    android:hint="@string/time_hint"/>
 
             </LinearLayout>
 

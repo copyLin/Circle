@@ -1,6 +1,8 @@
 package com.example.linxl.circle;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -12,13 +14,21 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.linxl.circle.gson.DeliveryItem;
+import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 
+import java.io.IOException;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created by Linxl on 2019/1/18.
@@ -79,8 +89,10 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mContext = parent.getContext();
         }
         if (viewType == TYPE_NORMAL){
-            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_delivery, parent, false);
+            final View view = LayoutInflater.from(mContext).inflate(R.layout.item_my_delivery, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
+            int position = holder.getAdapterPosition();
+            final DeliveryItem deliveryItem = mDeliveryItems.get(position);
             holder.moreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -89,11 +101,24 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     popupMenu.show();
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
-                        public boolean onMenuItemClick(MenuItem item) {
+                        public boolean onMenuItemClick(final MenuItem item) {
                             switch (item.getItemId()){
-                                case R.id.edit:
-                                    break;
                                 case R.id.delete:
+                                    AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+                                    dialog.setMessage("删除后将无法恢复，点击确定删除");
+                                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            deleteMyDelivery(deliveryItem.getUserId(), deliveryItem.getSendTime());
+                                        }
+                                    });
+                                    dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    dialog.show();
                                     break;
                                 case R.id.hide:
                                     break;
@@ -114,7 +139,16 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         }
                     });
 
-                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                    //popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                }
+            });
+
+            holder.mCardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mContext, UserCardActivity.class);
+                    intent.putExtra("userId", deliveryItem.getUserId());
+                    mContext.startActivity(intent);
                 }
             });
             return holder;
@@ -174,5 +208,27 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void changeState(int state) {
         this.footer_state = state;
         notifyDataSetChanged();
+    }
+
+    private void deleteMyDelivery(String userId, String sendTime) {
+        String address = mContext.getResources().getString(R.string.server_ip) + "deleteDeliveryServlet";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("userId", userId)
+                .add("sendTime", sendTime)
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(mContext, "操作失败", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+                    Toast.makeText(mContext, responseData, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

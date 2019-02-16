@@ -76,8 +76,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position){
         ContactItem item = mContactItems.get(position);
         holder.contactName.setText(item.getContactName());
-        holder.recentMsg.setText(item.getRecentMsg());
-        Glide.with(mContext).load(R.string.server_ip + "user_img/" + item.getContactImg()).into(holder.mCircleImageView);
+        holder.recentMsg.setText(item.getRecentChat());
+        Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "user_img/" + item.getContactImg()).into(holder.mCircleImageView);
 
         int count = DataSupport.where("fromId = ? and flag = ?", item.getContactId(), "0").count(ChatItem.class);
         if (count == 0){
@@ -93,6 +93,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
     @Override
     public int getItemCount(){
-        return mContactItems.size();
+        if (mContactItems != null){
+            return mContactItems.size();
+        }
+        return 0;
     }
 }

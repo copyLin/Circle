@@ -50,7 +50,7 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     private void requestForContact() {
-        String address = R.string.server_ip + "contactServlet";
+        String address = getString(R.string.server_ip) + "contactServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("userId", (String) SPUtil.getParam(this, SPUtil.USER_ID, ""))
                 .build();

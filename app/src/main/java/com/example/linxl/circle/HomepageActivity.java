@@ -1,6 +1,7 @@
 package com.example.linxl.circle;
 
 import android.content.DialogInterface;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,8 +11,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.example.linxl.circle.gson.UserItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 
@@ -31,6 +35,10 @@ public class HomepageActivity extends AppCompatActivity {
     private TextView userMajor;
     private TextView userWords;
     private Button changePassword;
+    private FloatingActionButton editInfo;
+    private UserItem mUser;
+
+    private String id = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,22 +52,64 @@ public class HomepageActivity extends AppCompatActivity {
         userMajor = (TextView) findViewById(R.id.user_major);
         userWords = (TextView) findViewById(R.id.user_words);
         changePassword = (Button) findViewById(R.id.change_password);
+        editInfo = (FloatingActionButton) findViewById(R.id.button_edit);
+
+        String address = getString(R.string.server_ip) + "userInformation";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("userId", id)
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(HomepageActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String responseData = response.body().string();
+                    Gson gson = new Gson();
+                    mUser = gson.fromJson(responseData, UserItem.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(HomepageActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mUser.getUserImg()).into(mCircleImageView);
+                            userId.setText(mUser.getUserId());
+                            userName.setText(mUser.getUserName());
+                            userDepartment.setText(mUser.getDepartment());
+                            userMajor.setText(mUser.getMajor());
+                            userWords.setText(mUser.getWords());
+                        }
+                    });
+                }
+
+            }
+        });
 
         changePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final EditText oldPassword = new EditText(HomepageActivity.this);
-                final EditText newPassword = new EditText(HomepageActivity.this);
-                final AlertDialog.Builder builder = new AlertDialog.Builder(HomepageActivity.this);
-                builder.setView(oldPassword);
-                builder.setView(newPassword);
-                builder.setPositiveButton("修改", new DialogInterface.OnClickListener() {
+                final EditText newPassword1 = new EditText(HomepageActivity.this);
+                final EditText newPassword2 = new EditText(HomepageActivity.this);
+                final AlertDialog.Builder dialog = new AlertDialog.Builder(HomepageActivity.this);
+                dialog.setView(oldPassword);
+                dialog.setView(newPassword1);
+                dialog.setView(newPassword2);
+                dialog.setPositiveButton("修改", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String address = R.string.server_ip + "changePasswordServlet";
+                        String address = getString(R.string.server_ip) + "changePassword";
                         RequestBody requestBody = new FormBody.Builder()
+                                .add("userId", id)
                                 .add("oldPassword", oldPassword.getText().toString())
-                                .add("newPassword", newPassword.getText().toString())
+                                .add("newPassword1", newPassword1.getText().toString())
+                                .add("newPassword2", newPassword2.getText().toString())
                                 .build();
                         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
                             @Override
@@ -67,7 +117,7 @@ public class HomepageActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toast.makeText(HomepageActivity.this, "修改失败", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(HomepageActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
@@ -75,10 +125,11 @@ public class HomepageActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Call call, Response response) throws IOException {
                                 if (response.isSuccessful()){
+                                    final String responseData = response.body().string();
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(HomepageActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(HomepageActivity.this, responseData, Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
@@ -86,6 +137,19 @@ public class HomepageActivity extends AppCompatActivity {
                         });
                     }
                 });
+                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+
+        editInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }

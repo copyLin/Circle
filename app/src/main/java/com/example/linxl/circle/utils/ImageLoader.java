@@ -43,7 +43,8 @@ public class ImageLoader {
     public  Intent choosePhoto() {
         if (ContextCompat.checkSelfPermission(MyApplication.getContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(mContext, R.string.permission_denied, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, mContext.getResources().getString(R.string.permission_denied), Toast.LENGTH_SHORT).show();
+            mIntent = new Intent();
         }else {
             mIntent = new Intent("android.intent.action.GET_CONTENT");
             mIntent.setType("image/*");
@@ -66,7 +67,7 @@ public class ImageLoader {
         }
         if (Build.VERSION.SDK_INT >= 24){
             imageUri = FileProvider.getUriForFile(mContext,
-                    "com.example.linxl.gduf_im.fileprovider", outputImage);
+                    "com.example.linxl.circle.fileprovider", outputImage);
         } else {
             imageUri = Uri.fromFile(outputImage);
         }
