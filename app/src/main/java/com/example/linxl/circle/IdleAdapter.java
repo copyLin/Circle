@@ -82,11 +82,12 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_idle, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            final int position = holder.getAdapterPosition();
-            final IdleItem item = mIdleItems.get(position);
+
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    IdleItem item = mIdleItems.get(position);
                     Intent intent = new Intent(mContext, IdleDetailActivity.class);
                     intent.putExtra("keyId", item.getIdleId());
                     intent.putExtra("label", "Idle");
@@ -97,6 +98,8 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             holder.commentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    IdleItem item = mIdleItems.get(position);
                     Intent intent = new Intent(mContext, IdleDetailActivity.class);
                     intent.putExtra("keyId", item.getIdleId());
                     intent.putExtra("label", "Idle");
@@ -107,6 +110,8 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             holder.connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    IdleItem item = mIdleItems.get(position);
                     Intent intent = new Intent(view.getContext(), ChatActivity.class);
                     intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
                     intent.putExtra("toId", item.getUserId());
@@ -130,9 +135,10 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             IdleItem idleItem = mIdleItems.get(position);
             ((NormalViewHolder) holder).idleName.setText(idleItem.getIdleName());
             ((NormalViewHolder) holder).idleContent.setText(idleItem.getContent());
-            ((NormalViewHolder) holder).idlePrice.setText(idleItem.getPrice());
-            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/" + idleItem.getUserId() + "/" + idleItem.getIdleImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
-
+            ((NormalViewHolder) holder).idlePrice.setText("¥ " + idleItem.getPrice());
+            if (!idleItem.getIdleImgs().isEmpty()) {
+                Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/" + idleItem.getUserId() + "/" + idleItem.getIdleImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
+            }
             if (idleItem.getUserId().equals(userId)) {
                 ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
                 ((NormalViewHolder) holder).connectButton.setEnabled(false);

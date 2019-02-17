@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +57,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             userName = (TextView) view.findViewById(R.id.user_name);
             sendTime = (TextView) view.findViewById(R.id.send_time);
             questionContent = (TextView) view.findViewById(R.id.question_content);
-            mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+            mRecyclerView = (RecyclerView) view.findViewById(R.id.question_images);
             commentButton = (ImageButton) view.findViewById(R.id.button_comment);
             connectButton = (ImageButton) view.findViewById(R.id.button_connect);
         }
@@ -86,11 +87,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_question, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            int position = holder.getAdapterPosition();
-            final QuestionItem item = mQuestionItems.get(position);
+
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    QuestionItem item = mQuestionItems.get(position);
                     Intent intent = new Intent(mContext, QuestionDetailActivity.class);
                     intent.putExtra("keyId", item.getQuestionId());
                     intent.putExtra("label", "Question");
@@ -101,6 +103,8 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.commentButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    QuestionItem item = mQuestionItems.get(position);
                     Intent intent = new Intent(mContext, QuestionDetailActivity.class);
                     intent.putExtra("keyId", item.getQuestionId());
                     intent.putExtra("label", "Question");
@@ -111,6 +115,8 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    QuestionItem item = mQuestionItems.get(position);
                     Intent intent = new Intent(view.getContext(), ChatActivity.class);
                     intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
                     intent.putExtra("toId", item.getUserId());
@@ -135,9 +141,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((NormalViewHolder) holder).sendTime.setText(questionItem.getSendTime());
             ((NormalViewHolder) holder).questionContent.setText(questionItem.getContent());
 
-            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + questionItem.getUserImg()).into(((NormalViewHolder) holder).mCircleImageView);
+            String path = mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + questionItem.getUserImg();
+            Glide.with(mContext).load(path).into(((NormalViewHolder) holder).mCircleImageView);
 
-            if (questionItem.getQuestionImgs() != null){
+            Log.d("————QuesAdapter————", "user_img" + path);
+
+            if (!questionItem.getQuestionImgs().isEmpty()){
                 List<String> imgPaths = new ArrayList<>();
                 for (String imgPath : questionItem.getQuestionImgs()){
                     imgPaths.add(mContext.getResources().getString(R.string.server_ip) + "image/" + questionItem.getUserId() + "/" + imgPath);
@@ -174,8 +183,8 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public int getItemViewType(int positon){
-        if (positon == getItemCount() - 1) {
+    public int getItemViewType(int position){
+        if (position == getItemCount() - 1) {
             return TYPE_FOOTER;
         }
         return TYPE_NORMAL;

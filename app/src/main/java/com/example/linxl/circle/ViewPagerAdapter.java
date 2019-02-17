@@ -2,7 +2,7 @@ package com.example.linxl.circle;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * Created by Linxl on 2018/11/25.
  */
 
-public class ViewPagerAdapter extends FragmentPagerAdapter {
+public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     private List<Fragment> mList;
 

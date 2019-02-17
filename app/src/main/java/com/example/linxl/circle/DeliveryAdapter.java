@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.DeliveryItem;
 import com.example.linxl.circle.utils.SPUtil;
 
@@ -38,7 +39,7 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     class NormalViewHolder extends RecyclerView.ViewHolder{
 
         CardView mCardView;
-        CircleImageView mImageView;
+        CircleImageView mCircleImageView;
         TextView sendTime;
         TextView deliveryContent;
         TextView price;
@@ -47,7 +48,7 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public NormalViewHolder(View view){
             super(view);
             mCardView = (CardView) view;
-            mImageView = (CircleImageView) view.findViewById(R.id.user_image);
+            mCircleImageView = (CircleImageView) view.findViewById(R.id.user_image);
             sendTime = (TextView) view.findViewById(R.id.delivery_time);
             deliveryContent = (TextView) view.findViewById(R.id.delivery_content);
             price = (TextView) view.findViewById(R.id.delivery_price);
@@ -80,11 +81,12 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_delivery, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            final int position = holder.getAdapterPosition();
-            final DeliveryItem item = mDeliveryItems.get(position);
+
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    DeliveryItem item = mDeliveryItems.get(position);
                     Intent intent = new Intent(v.getContext(), UserCardActivity.class);
                     intent.putExtra("userId", item.getUserId());
                     mContext.startActivity(intent);
@@ -93,6 +95,8 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    DeliveryItem item = mDeliveryItems.get(position);
                     Intent intent = new Intent(view.getContext(), ChatActivity.class);
                     intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
                     intent.putExtra("toId", item.getUserId());
@@ -116,7 +120,10 @@ public class DeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             DeliveryItem deliveryItem = mDeliveryItems.get(position);
             ((NormalViewHolder) holder).sendTime.setText(deliveryItem.getSendTime());
             ((NormalViewHolder) holder).deliveryContent.setText(deliveryItem.getContent());
-            ((NormalViewHolder) holder).price.setText(deliveryItem.getPrice());
+            ((NormalViewHolder) holder).price.setText("¥ " + deliveryItem.getPrice());
+
+            String path = mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + deliveryItem.getUserImg();
+            Glide.with(mContext).load(path).into(((NormalViewHolder) holder).mCircleImageView);
 
             if (deliveryItem.getUserId().equals(userId)) {
                 ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);

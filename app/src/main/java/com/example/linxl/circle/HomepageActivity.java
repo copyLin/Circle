@@ -2,9 +2,12 @@ package com.example.linxl.circle;
 
 import android.content.DialogInterface;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -53,6 +56,14 @@ public class HomepageActivity extends AppCompatActivity {
         userWords = (TextView) findViewById(R.id.user_words);
         changePassword = (Button) findViewById(R.id.change_password);
         editInfo = (FloatingActionButton) findViewById(R.id.button_edit);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+        }
 
         String address = getString(R.string.server_ip) + "userInformation";
         RequestBody requestBody = new FormBody.Builder()
@@ -152,5 +163,17 @@ public class HomepageActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 }

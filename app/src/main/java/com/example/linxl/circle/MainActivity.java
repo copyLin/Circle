@@ -89,16 +89,16 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()){
                     case R.id.nav_question:
                         mViewPager.setCurrentItem(0);
-                        return true;
+                        break;
                     case R.id.nav_lost:
                         mViewPager.setCurrentItem(1);
-                        return true;
+                        break;
                     case R.id.nav_idle:
                         mViewPager.setCurrentItem(2);
-                        return true;
+                        break;
                     case R.id.nav_delivery:
                         mViewPager.setCurrentItem(3);
-                        return true;
+                        break;
                 }
                 return false;
             }
@@ -117,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     mBottomNavigationView.getMenu().getItem(0).setChecked(false);
                 }
-                mMenuItem = mBottomNavigationView.getMenu().getItem(position);
-                mMenuItem.setChecked(true);
+                mBottomNavigationView.getMenu().getItem(position).setChecked(true);
 
             }
 
@@ -161,20 +160,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(adapter);
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(new QuestionFragment());
         fragments.add(new LostFragment());
         fragments.add(new IdleFragment());
         fragments.add(new DeliveryFragment());
         adapter.setList(fragments);
+        mViewPager.setAdapter(adapter);
+        mViewPager.setOffscreenPageLimit(3);
 
         Intent serviceIntent = new Intent(this, ChatService.class);
         startService(serviceIntent);
 
         MessageReceiver messageReceiver = new MessageReceiver();
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.example.linxl.gduf_im.NEW_MESSAGE");
+        intentFilter.addAction("com.example.linxl.circle.NEW_MESSAGE");
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(MyApplication.getContext());
         localBroadcastManager.registerReceiver(messageReceiver, intentFilter);
 

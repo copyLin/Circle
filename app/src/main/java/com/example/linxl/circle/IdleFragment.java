@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,9 @@ public class IdleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_idle, container, false);
+
+        Log.d("————IdleFragment————", "onCreate");
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
@@ -55,10 +59,10 @@ public class IdleFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         adapter = new IdleAdapter(allItems);
 
+        requestForIdle();
+
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
-
-        requestForIdle();
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

@@ -55,7 +55,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private QuestionItem mQuestionItem;
     private List<ViewPointItem> mViewPointItems;
 
-    private String myId = (String) SPUtil.getParam(this, SPUtil.USER_ID, "");
+    private String myId = (String) SPUtil.getParam(QuestionDetailActivity.this, SPUtil.USER_ID, "");
     private String userId;
 
     @Override

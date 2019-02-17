@@ -55,9 +55,8 @@ public class QuestionFragment extends Fragment {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
         allItems = new ArrayList<>();
-        layoutManager = new LinearLayoutManager(getContext());
+        layoutManager = new LinearLayoutManager(MyApplication.getContext());
         adapter = new QuestionAdapter(allItems);
-
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
 
@@ -133,15 +132,17 @@ public class QuestionFragment extends Fragment {
                         QuestionItem item = items.get(items.size() - 1);
                         currentId = item.getQuestionId();
                         allItems.addAll(items);
+
+                        Log.d("————QuesFragment————", "currentId: " + currentId);
+                        Log.d("————QuesFragment————", "items: " + allItems);
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 adapter.notifyDataSetChanged();
-
                             }
                         });
                     }
-
                 }
             }
         });

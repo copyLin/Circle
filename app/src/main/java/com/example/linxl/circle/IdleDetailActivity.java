@@ -57,7 +57,7 @@ public class IdleDetailActivity extends AppCompatActivity {
     private IdleItem mIdleItem;
     private List<ViewPointItem> mViewPointItems;
 
-    private String myId = (String) SPUtil.getParam(this, SPUtil.USER_ID, "");
+    private String myId = (String) SPUtil.getParam(IdleDetailActivity.this, SPUtil.USER_ID, "");
     private String userId;
 
     @Override

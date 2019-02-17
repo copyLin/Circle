@@ -58,7 +58,7 @@ public class LostDetailActivity extends AppCompatActivity {
     private LostItem mLostItem;
     private List<ViewPointItem> mViewPointItems;
 
-    private String myId = (String) SPUtil.getParam(this, SPUtil.USER_ID, "");
+    private String myId = (String) SPUtil.getParam(LostDetailActivity.this, SPUtil.USER_ID, "");
     private String userId;
 
     @Override
