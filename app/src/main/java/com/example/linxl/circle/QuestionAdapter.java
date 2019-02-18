@@ -155,15 +155,16 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 ImageAdapter adapter = new ImageAdapter(imgPaths);
                 ((NormalViewHolder) holder).mRecyclerView.setLayoutManager(layoutManager);
                 ((NormalViewHolder) holder).mRecyclerView.setAdapter(adapter);
-
-                if (questionItem.getUserId().equals(userId)) {
-                    ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
-                    ((NormalViewHolder) holder).connectButton.setEnabled(false);
-                }else {
-                    ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect);
-                    ((NormalViewHolder) holder).connectButton.setEnabled(true);
-                }
             }
+
+            if (questionItem.getUserId().equals(userId)) {
+                ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
+                ((NormalViewHolder) holder).connectButton.setEnabled(false);
+            }else {
+                ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect);
+                ((NormalViewHolder) holder).connectButton.setEnabled(true);
+            }
+
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {
                 ((FooterViewHolder)holder).mProgressBar.setVisibility(View.GONE);

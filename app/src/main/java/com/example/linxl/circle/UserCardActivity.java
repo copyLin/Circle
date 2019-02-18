@@ -26,6 +26,13 @@ import okhttp3.Response;
 
 public class UserCardActivity extends AppCompatActivity {
 
+    private CircleImageView mCircleImageView;
+    private TextView userName;
+    private TextView userId;
+    private TextView userDepartment;
+    private TextView userMajor;
+    private TextView userWords;
+
     private UserItem mUser;
 
     @Override
@@ -33,12 +40,12 @@ public class UserCardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_card);
 
-        CircleImageView circleImageView = (CircleImageView) findViewById(R.id.user_image);
-        TextView userName = (TextView) findViewById(R.id.user_name);
-        TextView userId = (TextView) findViewById(R.id.user_id);
-        TextView userDepartment = (TextView) findViewById(R.id.user_department);
-        TextView userMajor = (TextView) findViewById(R.id.user_major);
-        TextView userWords= (TextView) findViewById(R.id.user_words);
+        mCircleImageView= (CircleImageView) findViewById(R.id.user_image);
+        userName = (TextView) findViewById(R.id.user_name);
+        userId = (TextView) findViewById(R.id.user_id);
+        userDepartment = (TextView) findViewById(R.id.user_department);
+        userMajor = (TextView) findViewById(R.id.user_major);
+        userWords= (TextView) findViewById(R.id.user_words);
         Button sendButton = (Button) findViewById(R.id.button_send);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -72,16 +79,22 @@ public class UserCardActivity extends AppCompatActivity {
                     final String responseData = response.body().string();
                     Gson gson = new Gson();
                     mUser = gson.fromJson(responseData, UserItem.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(UserCardActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mUser.getUserImg()).into(mCircleImageView);
+                            userId.setText(mUser.getUserId());
+                            userName.setText(mUser.getUserName());
+                            userDepartment.setText(mUser.getDepartment());
+                            userMajor.setText(mUser.getMajor());
+                            userWords.setText(mUser.getWords());
+                        }
+                    });
                 }
             }
         });
 
-        Glide.with(UserCardActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mUser.getUserImg()).into(circleImageView);
-        userId.setText(mUser.getUserId());
-        userName.setText(mUser.getUserName());
-        userDepartment.setText(mUser.getDepartment());
-        userMajor.setText(mUser.getMajor());
-        userWords.setText(mUser.getWords());
+
     }
 
     @Override

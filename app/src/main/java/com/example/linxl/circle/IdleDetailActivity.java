@@ -55,9 +55,10 @@ public class IdleDetailActivity extends AppCompatActivity {
     private ViewPointAdapter mViewPointAdapter;
 
     private IdleItem mIdleItem;
+    private List<String> imgPaths;
     private List<ViewPointItem> mViewPointItems;
 
-    private String myId = (String) SPUtil.getParam(IdleDetailActivity.this, SPUtil.USER_ID, "");
+    private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
     private String userId;
 
     @Override
@@ -74,6 +75,8 @@ public class IdleDetailActivity extends AppCompatActivity {
         connectButton = (ImageButton) findViewById(R.id.button_connect);
         images = (RecyclerView) findViewById(R.id.idle_images);
         viewPoint = (RecyclerView) findViewById(R.id.view_point);
+        imgPaths = new ArrayList<>();
+        mViewPointItems = new ArrayList<>();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -110,22 +113,32 @@ public class IdleDetailActivity extends AppCompatActivity {
                     String responseData = response.body().string();
                     Gson gson = new Gson();
                     mIdleItem = gson.fromJson(responseData, IdleItem.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            userName.setText(mIdleItem.getUserName());
+                            sendTime.setText(mIdleItem.getSendTime());
+                            idleName.setText(mIdleItem.getIdleName());
+                            content.setText(mIdleItem.getContent());
+                            idlePrice.setText(mIdleItem.getPrice());
+                            Glide.with(IdleDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mIdleItem.getUserImg()).into(mCircleImageView);
+
+                            imgPaths = new ArrayList<>();
+                            if (!mIdleItem.getIdleImgs().isEmpty()) {
+                                for (String imgPath : mIdleItem.getIdleImgs()) {
+                                    imgPaths.add(getString(R.string.server_ip) + "image/" + mIdleItem.getUserId() + "/" + imgPath);
+                                }
+                            }
+                            mImageAdapter.notifyDataSetChanged();
+
+                            invalidateOptionsMenu();
+                        }
+                    });
                 }
             }
         });
-        userName.setText(mIdleItem.getUserName());
-        sendTime.setText(mIdleItem.getSendTime());
-        idleName.setText(mIdleItem.getIdleName());
-        content.setText(mIdleItem.getContent());
-        idlePrice.setText(mIdleItem.getPrice());
-        Glide.with(this).load(getString(R.string.server_ip) + "user_img/" + mIdleItem.getUserImg()).into(mCircleImageView);
 
-        List<String> imgPaths = new ArrayList<>();
-        for (String imgPath : mIdleItem.getIdleImgs()){
-            imgPaths.add(getString(R.string.server_ip) + "image/" + mIdleItem.getUserId() + "/" + imgPath);
-        }
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(IdleDetailActivity.this, 3);
         mImageAdapter = new ImageAdapter(imgPaths);
         images.setLayoutManager(gridLayoutManager);
         images.setAdapter(mImageAdapter);
@@ -151,9 +164,25 @@ public class IdleDetailActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Gson gson = new Gson();
-                    mViewPointItems = gson.fromJson(responseData,
-                            new TypeToken<List<ViewPointItem>>(){}.getType());
+                    if (responseData.equals("NoData")){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(IdleDetailActivity.this, "暂时没有评论", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }else {
+                        Gson gson = new Gson();
+                        mViewPointItems = gson.fromJson(responseData,
+                                new TypeToken<List<ViewPointItem>>() {
+                                }.getType());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mViewPointAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -235,20 +264,25 @@ public class IdleDetailActivity extends AppCompatActivity {
 
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_popup, menu);
-        if (myId.equals(userId)){
-            menu.getItem(R.id.delete).setVisible(true);
-            if (mIdleItem.isFlag()){
-                menu.getItem(R.id.hide).setVisible(false);
-                menu.getItem(R.id.open).setVisible(true);
-            }else {
-                menu.getItem(R.id.hide).setVisible(true);
-                menu.getItem(R.id.open).setVisible(false);
-            }
 
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        if (myId.equals(userId)){
+            menu.findItem(R.id.delete).setVisible(true);
+            if (mIdleItem != null && mIdleItem.isFlag()){
+                menu.findItem(R.id.hide).setVisible(false);
+                menu.findItem(R.id.open).setVisible(true);
+            }else {
+                menu.findItem(R.id.hide).setVisible(true);
+                menu.findItem(R.id.open).setVisible(false);
+            }
         }else {
-            menu.getItem(R.id.delete).setVisible(false);
-            menu.getItem(R.id.hide).setVisible(false);
-            menu.getItem(R.id.open).setVisible(false);
+            menu.findItem(R.id.delete).setVisible(false);
+            menu.findItem(R.id.hide).setVisible(false);
+            menu.findItem(R.id.open).setVisible(false);
         }
         return true;
     }

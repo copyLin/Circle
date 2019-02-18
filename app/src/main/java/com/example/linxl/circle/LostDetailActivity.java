@@ -56,9 +56,10 @@ public class LostDetailActivity extends AppCompatActivity {
     private ViewPointAdapter mViewPointAdapter;
 
     private LostItem mLostItem;
+    private List<String> imgPaths;
     private List<ViewPointItem> mViewPointItems;
 
-    private String myId = (String) SPUtil.getParam(LostDetailActivity.this, SPUtil.USER_ID, "");
+    private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
     private String userId;
 
     @Override
@@ -76,6 +77,8 @@ public class LostDetailActivity extends AppCompatActivity {
         connectButton = (ImageButton) findViewById(R.id.button_connect);
         images = (RecyclerView) findViewById(R.id.lost_images);
         viewPoint = (RecyclerView) findViewById(R.id.view_point);
+        imgPaths = new ArrayList<>();
+        mViewPointItems = new ArrayList<>();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,22 +115,32 @@ public class LostDetailActivity extends AppCompatActivity {
                     String responseData = response.body().string();
                     Gson gson = new Gson();
                     mLostItem = gson.fromJson(responseData, LostItem.class);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            userName.setText(mLostItem.getUserName());
+                            sendTime.setText(mLostItem.getSendTime());
+                            content.setText(mLostItem.getContent());
+                            lostTime.setText(mLostItem.getEventTime());
+                            lostContact.setText(mLostItem.getContact());
+                            Glide.with(LostDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mLostItem.getUserImg()).into(mCircleImageView);
+
+                            imgPaths = new ArrayList<>();
+                            if (!mLostItem.getLostImgs().isEmpty()) {
+                                for (String imgPath : mLostItem.getLostImgs()) {
+                                    imgPaths.add(getString(R.string.server_ip) + "image/" + mLostItem.getUserId() + "/" + imgPath);
+                                }
+                            }
+                            mImageAdapter.notifyDataSetChanged();
+
+                            invalidateOptionsMenu();
+                        }
+                    });
                 }
             }
         });
-        userName.setText(mLostItem.getUserName());
-        sendTime.setText(mLostItem.getSendTime());
-        content.setText(mLostItem.getContent());
-        lostTime.setText(mLostItem.getEventTime());
-        lostContact.setText(mLostItem.getContact());
-        Glide.with(this).load(getString(R.string.server_ip) + "user_img/" + mLostItem.getUserImg()).into(mCircleImageView);
 
-        List<String> imgPaths = new ArrayList<>();
-        for (String imgPath : mLostItem.getLostImgs()){
-            imgPaths.add(getString(R.string.server_ip) + "image/" + mLostItem.getUserId() + "/" + imgPath);
-        }
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(LostDetailActivity.this, 3);
         mImageAdapter = new ImageAdapter(imgPaths);
         images.setLayoutManager(gridLayoutManager);
         images.setAdapter(mImageAdapter);
@@ -153,9 +166,25 @@ public class LostDetailActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Gson gson = new Gson();
-                    mViewPointItems = gson.fromJson(responseData,
-                            new TypeToken<List<ViewPointItem>>(){}.getType());
+                    if (responseData.equals("NoData")){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(LostDetailActivity.this, "暂时没有评论", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }else {
+                        Gson gson = new Gson();
+                        mViewPointItems = gson.fromJson(responseData,
+                                new TypeToken<List<ViewPointItem>>() {
+                                }.getType());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mViewPointAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -237,20 +266,24 @@ public class LostDetailActivity extends AppCompatActivity {
 
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_popup, menu);
-        if (myId.equals(userId)){
-            menu.getItem(R.id.delete).setVisible(true);
-            if (mLostItem.isFlag()){
-                menu.getItem(R.id.hide).setVisible(false);
-                menu.getItem(R.id.open).setVisible(true);
-            }else {
-                menu.getItem(R.id.hide).setVisible(true);
-                menu.getItem(R.id.open).setVisible(false);
-            }
+        return true;
+    }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        if (myId.equals(userId)){
+            menu.findItem(R.id.delete).setVisible(true);
+            if (mLostItem != null && mLostItem.isFlag()){
+                menu.findItem(R.id.hide).setVisible(false);
+                menu.findItem(R.id.open).setVisible(true);
+            }else {
+                menu.findItem(R.id.hide).setVisible(true);
+                menu.findItem(R.id.open).setVisible(false);
+            }
         }else {
-            menu.getItem(R.id.delete).setVisible(false);
-            menu.getItem(R.id.hide).setVisible(false);
-            menu.getItem(R.id.open).setVisible(false);
+            menu.findItem(R.id.delete).setVisible(false);
+            menu.findItem(R.id.hide).setVisible(false);
+            menu.findItem(R.id.open).setVisible(false);
         }
         return true;
     }

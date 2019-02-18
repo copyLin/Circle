@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.QuestionItem;
@@ -103,6 +104,9 @@ public class MyQuestionsActivity extends AppCompatActivity {
                         QuestionItem item = items.get(items.size() - 1);
                         currentId = item.getQuestionId();
                         allItems.addAll(items);
+
+                        Log.d("————MyQuestion————", "items: " + allItems);
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

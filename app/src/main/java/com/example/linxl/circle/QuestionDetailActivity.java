@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,9 +54,10 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private ViewPointAdapter mViewPointAdapter;
 
     private QuestionItem mQuestionItem;
+    private List<String> imgPaths;
     private List<ViewPointItem> mViewPointItems;
 
-    private String myId = (String) SPUtil.getParam(QuestionDetailActivity.this, SPUtil.USER_ID, "");
+    private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
     private String userId;
 
     @Override
@@ -70,6 +72,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
         connectButton = (ImageButton) findViewById(R.id.button_connect);
         images = (RecyclerView) findViewById(R.id.question_images);
         viewPoint = (RecyclerView) findViewById(R.id.view_point);
+        imgPaths = new ArrayList<>();
+        mViewPointItems = new ArrayList<>();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -106,29 +110,41 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     String responseData = response.body().string();
                     Gson gson = new Gson();
                     mQuestionItem = gson.fromJson(responseData, QuestionItem.class);
+
+                    Log.d("————QuesDetail————", "item: " + mQuestionItem);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            userName.setText(mQuestionItem.getUserName());
+                            sendTime.setText(mQuestionItem.getSendTime());
+                            content.setText(mQuestionItem.getContent());
+                            Glide.with(QuestionDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mQuestionItem.getUserImg()).into(mCircleImageView);
+
+                            imgPaths = new ArrayList<>();
+                            if (!mQuestionItem.getQuestionImgs().isEmpty()){
+                                for (String imgPath : mQuestionItem.getQuestionImgs()){
+                                    imgPaths.add(getString(R.string.server_ip) + "image/" + mQuestionItem.getUserId() + "/" + imgPath);
+                                }
+                            }
+                            mImageAdapter.notifyDataSetChanged();
+
+                            invalidateOptionsMenu();
+                        }
+                    });
                 }
             }
         });
 
-        userName.setText(mQuestionItem.getUserName());
-        sendTime.setText(mQuestionItem.getSendTime());
-        content.setText(mQuestionItem.getContent());
-        Glide.with(this).load(getString(R.string.server_ip) + "user_img/" + mQuestionItem.getUserImg()).into(mCircleImageView);
-
-        List<String> imgPaths = new ArrayList<>();
-        for (String imgPath : mQuestionItem.getQuestionImgs()){
-            imgPaths.add(getString(R.string.server_ip) + "image/" + mQuestionItem.getUserId() + "/" + imgPath);
-        }
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(QuestionDetailActivity.this, 3);
         mImageAdapter = new ImageAdapter(imgPaths);
         images.setLayoutManager(gridLayoutManager);
         images.setAdapter(mImageAdapter);
 
         address = getString(R.string.server_ip) + "viewPointServlet";
         requestBody = new FormBody.Builder()
-                .add("keyId", mQuestionItem.getQuestionId())
-                .add("label", "Question")
+                .add("keyId", keyId)
+                .add("label", label)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -146,9 +162,25 @@ public class QuestionDetailActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Gson gson = new Gson();
-                    mViewPointItems = gson.fromJson(responseData,
-                            new TypeToken<List<ViewPointItem>>(){}.getType());
+                    if (responseData.equals("NoData")){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(QuestionDetailActivity.this, "暂时没有评论", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }else {
+                        Gson gson = new Gson();
+                        mViewPointItems = gson.fromJson(responseData,
+                                new TypeToken<List<ViewPointItem>>() {
+                                }.getType());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mViewPointAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -227,22 +259,27 @@ public class QuestionDetailActivity extends AppCompatActivity {
         });
     }
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_popup, menu);
-        if (myId.equals(userId)){
-            menu.getItem(R.id.delete).setVisible(true);
-            if (mQuestionItem.isFlag()){
-                menu.getItem(R.id.hide).setVisible(false);
-                menu.getItem(R.id.open).setVisible(true);
-            }else {
-                menu.getItem(R.id.hide).setVisible(true);
-                menu.getItem(R.id.open).setVisible(false);
-            }
+        return true;
+    }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        if (myId.equals(userId)){
+            menu.findItem(R.id.delete).setVisible(true);
+            if (mQuestionItem != null && mQuestionItem.isFlag()){
+                menu.findItem(R.id.hide).setVisible(false);
+                menu.findItem(R.id.open).setVisible(true);
+            }else {
+                menu.findItem(R.id.hide).setVisible(true);
+                menu.findItem(R.id.open).setVisible(false);
+            }
         }else {
-            menu.getItem(R.id.delete).setVisible(false);
-            menu.getItem(R.id.hide).setVisible(false);
-            menu.getItem(R.id.open).setVisible(false);
+            menu.findItem(R.id.delete).setVisible(false);
+            menu.findItem(R.id.hide).setVisible(false);
+            menu.findItem(R.id.open).setVisible(false);
         }
         return true;
     }
