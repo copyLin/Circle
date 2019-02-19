@@ -1,9 +1,11 @@
 package com.example.linxl.circle;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -40,6 +42,13 @@ public class MyQuestionsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_questions);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+        }
 
         allItems = new ArrayList<>();
         layoutManager = new LinearLayoutManager(this);
@@ -120,4 +129,6 @@ public class MyQuestionsActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }

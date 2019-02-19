@@ -88,6 +88,16 @@ public class QuestionDetailActivity extends AppCompatActivity {
         String label = intent.getStringExtra("label");
         userId = intent.getStringExtra("userId");
 
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(QuestionDetailActivity.this, 3);
+        mImageAdapter = new ImageAdapter(imgPaths);
+        images.setLayoutManager(gridLayoutManager);
+        images.setAdapter(mImageAdapter);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mViewPointAdapter = new ViewPointAdapter(mViewPointItems);
+        viewPoint.setLayoutManager(linearLayoutManager);
+        viewPoint.setAdapter(mViewPointAdapter);
+
         String address = getString(R.string.server_ip) + "itemDetailServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("keyId", keyId)
@@ -121,25 +131,27 @@ public class QuestionDetailActivity extends AppCompatActivity {
                             content.setText(mQuestionItem.getContent());
                             Glide.with(QuestionDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mQuestionItem.getUserImg()).into(mCircleImageView);
 
-                            imgPaths = new ArrayList<>();
                             if (!mQuestionItem.getQuestionImgs().isEmpty()){
                                 for (String imgPath : mQuestionItem.getQuestionImgs()){
                                     imgPaths.add(getString(R.string.server_ip) + "image/" + mQuestionItem.getUserId() + "/" + imgPath);
                                 }
                             }
-                            mImageAdapter.notifyDataSetChanged();
 
+                            if (mQuestionItem.getUserId().equals(myId)){
+                                connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
+                                connectButton.setEnabled(false);
+                            }else {
+                                connectButton.setBackgroundResource(R.drawable.ic_connect);
+                                connectButton.setEnabled(true);
+                            }
+
+                            mImageAdapter.notifyDataSetChanged();
                             invalidateOptionsMenu();
                         }
                     });
                 }
             }
         });
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(QuestionDetailActivity.this, 3);
-        mImageAdapter = new ImageAdapter(imgPaths);
-        images.setLayoutManager(gridLayoutManager);
-        images.setAdapter(mImageAdapter);
 
         address = getString(R.string.server_ip) + "viewPointServlet";
         requestBody = new FormBody.Builder()
@@ -185,11 +197,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
             }
         });
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        mViewPointAdapter = new ViewPointAdapter(mViewPointItems);
-        viewPoint.setLayoutManager(linearLayoutManager);
-        viewPoint.setAdapter(mViewPointAdapter);
-
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -234,6 +241,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                         });
                     }
                 });
+                builder.show();
             }
         });
 
@@ -376,14 +384,24 @@ public class QuestionDetailActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(QuestionDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(QuestionDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -399,14 +417,24 @@ public class QuestionDetailActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(QuestionDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(QuestionDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -422,14 +450,24 @@ public class QuestionDetailActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(QuestionDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(QuestionDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -448,14 +486,24 @@ public class QuestionDetailActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(QuestionDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(QuestionDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });

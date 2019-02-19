@@ -58,7 +58,7 @@ public class UserCardActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String id = intent.getStringExtra("userId");
 
-        String address = getString(R.string.server_ip) + "getUserInformation";
+        String address = getString(R.string.server_ip) + "userInformation";
         RequestBody requestBody = new FormBody.Builder()
                 .add("userId", id)
                 .build();

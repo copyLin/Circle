@@ -141,7 +141,7 @@ public class ChatActivity extends AppCompatActivity {
 
         mChatReceiver = new ChatReceiver();
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.example.linxl.gduf_im.NEW_MESSAGE");
+        intentFilter.addAction("com.example.linxl.circle.NEW_MESSAGE");
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(MyApplication.getContext());
         mLocalBroadcastManager.registerReceiver(mChatReceiver, intentFilter);
     }

@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,8 @@ import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.ChatItem;
 import com.example.linxl.circle.utils.BottomNavigationViewHelper;
 import com.example.linxl.circle.utils.SPUtil;
+
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView mBottomNavigationView;
     private ViewPager mViewPager;
     private MenuItem mMenuItem;
+
+    private Intent serviceIntent;
+    private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.setAdapter(adapter);
         mViewPager.setOffscreenPageLimit(3);
 
-        Intent serviceIntent = new Intent(this, ChatService.class);
+        serviceIntent = new Intent(this, ChatService.class);
         startService(serviceIntent);
 
         MessageReceiver messageReceiver = new MessageReceiver();
@@ -216,11 +222,31 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        Log.d("————MainActivity————", "activity restart");
+        int count = DataSupport.where("toId = ? and flag = ?", userId, "0").count(ChatItem.class);
+        if (count == 0) {
+            mFloatingActionButton.setImageResource(R.drawable.ic_chat);
+        } else {
+            mFloatingActionButton.setImageResource(R.drawable.ic_chat_new);
+        }
+
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        Log.d("———— MainActivity ————", "activity destroy");
+        stopService(serviceIntent);
+    }
+
+
     class MessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent){
             ChatItem item = (ChatItem) intent.getSerializableExtra("new_msg");
-            String userId = (String) SPUtil.getParam(context, SPUtil.USER_ID, "");
             if(item.getFromId().equals(userId)){
 
             }else {

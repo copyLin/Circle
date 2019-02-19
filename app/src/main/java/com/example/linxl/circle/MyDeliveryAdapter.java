@@ -4,12 +4,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -19,6 +22,7 @@ import android.widget.Toast;
 import com.example.linxl.circle.gson.DeliveryItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
+import com.example.linxl.circle.utils.TimeCapture;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,11 +44,30 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     static final int LOADING_MORE = 0;
     static final int NO_MORE = 1;
 
+    static final int CONTROL_SUCCESS = 0;
+    static final int CONTROL_FAIL = 1;
+
     private int footer_state = 0;
     private Context mContext;
     private List<DeliveryItem> mDeliveryItems;
 
     private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message message) {
+            switch (message.what) {
+                case CONTROL_SUCCESS:
+                    Toast.makeText(MyApplication.getContext(), "操作成功", Toast.LENGTH_SHORT).show();
+                    break;
+                case CONTROL_FAIL:
+                    Toast.makeText(MyApplication.getContext(), "操作失败", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     class NormalViewHolder extends RecyclerView.ViewHolder{
 
@@ -91,38 +114,87 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_my_delivery, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            int position = holder.getAdapterPosition();
-            final DeliveryItem deliveryItem = mDeliveryItems.get(position);
+
             holder.moreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    final DeliveryItem deliveryItem = mDeliveryItems.get(position);
                     PopupMenu popupMenu = new PopupMenu(mContext,v);
                     popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
                     popupMenu.show();
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
-                        public boolean onMenuItemClick(final MenuItem item) {
+                        public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()){
                                 case R.id.delete:
-                                    AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-                                    dialog.setMessage("删除后将无法恢复，点击确定删除");
-                                    dialog.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    android.support.v7.app.AlertDialog.Builder dialog1 = new android.support.v7.app.AlertDialog.Builder(mContext);
+                                    dialog1.setMessage("删除后将无法恢复，点击确定删除");
+                                    dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             deleteMyDelivery(deliveryItem.getUserId(), deliveryItem.getSendTime());
                                         }
                                     });
-                                    dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                    dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
                                         }
                                     });
-                                    dialog.show();
+                                    dialog1.show();
                                     break;
                                 case R.id.hide:
+                                    android.support.v7.app.AlertDialog.Builder dialog2 = new android.support.v7.app.AlertDialog.Builder(mContext);
+                                    dialog2.setMessage("点击确定，将问题设为仅自己可见");
+                                    dialog2.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            hideMyDelivery(deliveryItem.getUserId(), deliveryItem.getSendTime());
+                                        }
+                                    });
+                                    dialog2.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    dialog2.show();
+                                    break;
+                                case R.id.open:
+                                    android.support.v7.app.AlertDialog.Builder dialog3 = new android.support.v7.app.AlertDialog.Builder(mContext);
+                                    dialog3.setMessage("点击确定，将问题设为公开");
+                                    dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            openMyDelivery(deliveryItem.getUserId(), deliveryItem.getSendTime());
+                                        }
+                                    });
+                                    dialog3.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    dialog3.show();
                                     break;
                                 case R.id.like:
+                                    final EditText name = new EditText(mContext);
+                                    android.support.v7.app.AlertDialog.Builder dialog4 = new android.support.v7.app.AlertDialog.Builder(mContext);
+                                    dialog4.setView(name);
+                                    dialog4.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            addCollection(name.getText().toString(), deliveryItem.getUserId(), deliveryItem.getDeliveryId());
+                                        }
+                                    });
+                                    dialog4.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    dialog4.show();
                                     break;
                                 case R.id.report:
                                     break;
@@ -139,13 +211,21 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         }
                     });
 
-                    //popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                    if (deliveryItem.isFlag()){
+                        popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
+                        popupMenu.getMenu().findItem(R.id.open).setVisible(true);
+                    }else {
+                        popupMenu.getMenu().findItem(R.id.hide).setVisible(true);
+                        popupMenu.getMenu().findItem(R.id.open).setVisible(false);
+                    }
                 }
             });
 
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    DeliveryItem deliveryItem = mDeliveryItems.get(position);
                     Intent intent = new Intent(mContext, UserCardActivity.class);
                     intent.putExtra("userId", deliveryItem.getUserId());
                     mContext.startActivity(intent);
@@ -219,14 +299,106 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "操作失败", Toast.LENGTH_SHORT).show();
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(mContext, responseData, Toast.LENGTH_SHORT).show();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
+                }
+            }
+        });
+    }
+
+    private void hideMyDelivery(String userId, String sendTime) {
+        String address = mContext.getResources().getString(R.string.server_ip) + "updateDeliveryFlag";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("userId", userId)
+                .add("sendTime", sendTime)
+                .add("flag", "true")
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
+                }
+            }
+        });
+    }
+
+    private void openMyDelivery(String userId, String sendTime) {
+        String address = mContext.getResources().getString(R.string.server_ip) + "updateDeliveryFlag";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("userId", userId)
+                .add("sendTime", sendTime)
+                .add("flag", "false")
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
+                }
+            }
+        });
+    }
+
+    private void addCollection(String name, String userId, String keyId) {
+        String sendTime = TimeCapture.getChinaTime();
+        String address = mContext.getResources().getString(R.string.server_ip) + "newCollectionServlet";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("name", name)
+                .add("userId", userId)
+                .add("collectionTime", sendTime)
+                .add("keyId", keyId)
+                .add("label", "Delivery")
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
                 }
             }
         });

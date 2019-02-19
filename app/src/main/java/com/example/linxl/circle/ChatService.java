@@ -58,9 +58,10 @@ public class ChatService extends Service {
                         if (socket.isConnected()) {
                             if (!socket.isOutputShutdown()) {
                                 String jsonData  = mGson.toJson(item);
-                                out.write(jsonData);
+                                out.write(jsonData + "\n");
+                                out.flush();
 
-                                Intent intent = new Intent("com.example.linxl.gduf_im.NEW_MESSAGE");
+                                Intent intent = new Intent("com.example.linxl.circle.NEW_MESSAGE");
                                 intent.putExtra("new_msg", item);
                                 mLocalBroadcastManager.sendBroadcast(intent);
                             } else {
@@ -110,7 +111,7 @@ public class ChatService extends Service {
                                         ChatItem item = mGson.fromJson(jsonData, ChatItem.class);
                                         item.save();
 
-                                        Intent intent = new Intent("com.example.linxl.gduf_im.NEW_MESSAGE");
+                                        Intent intent = new Intent("com.example.linxl.circle.NEW_MESSAGE");
                                         intent.putExtra("new_msg", item);
                                         mLocalBroadcastManager.sendBroadcast(intent);
 
@@ -144,7 +145,7 @@ public class ChatService extends Service {
                 try {
                     if (socket != null) {
                         if (!socket.isOutputShutdown()) {
-                            out.write("exit:" + userId);
+                            out.write("exit:" + userId + "\n");
                             out.flush();
                         }
                     }
@@ -176,7 +177,8 @@ public class ChatService extends Service {
             socket = new Socket(HOST, PORT);
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out.write("enter:" + userId);
+            out.write("enter:" + userId + "\n");
+            out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

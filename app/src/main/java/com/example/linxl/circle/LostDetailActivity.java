@@ -93,6 +93,16 @@ public class LostDetailActivity extends AppCompatActivity {
         String label = intent.getStringExtra("label");
         userId = intent.getStringExtra("userId");
 
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(LostDetailActivity.this, 3);
+        mImageAdapter = new ImageAdapter(imgPaths);
+        images.setLayoutManager(gridLayoutManager);
+        images.setAdapter(mImageAdapter);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mViewPointAdapter = new ViewPointAdapter(mViewPointItems);
+        viewPoint.setLayoutManager(linearLayoutManager);
+        viewPoint.setAdapter(mViewPointAdapter);
+
         String address = getString(R.string.server_ip) + "itemDetailServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("keyId", keyId)
@@ -125,25 +135,27 @@ public class LostDetailActivity extends AppCompatActivity {
                             lostContact.setText(mLostItem.getContact());
                             Glide.with(LostDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mLostItem.getUserImg()).into(mCircleImageView);
 
-                            imgPaths = new ArrayList<>();
                             if (!mLostItem.getLostImgs().isEmpty()) {
                                 for (String imgPath : mLostItem.getLostImgs()) {
                                     imgPaths.add(getString(R.string.server_ip) + "image/" + mLostItem.getUserId() + "/" + imgPath);
                                 }
                             }
-                            mImageAdapter.notifyDataSetChanged();
 
+                            if (mLostItem.getUserId().equals(myId)){
+                                connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
+                                connectButton.setEnabled(false);
+                            }else {
+                                connectButton.setBackgroundResource(R.drawable.ic_connect);
+                                connectButton.setEnabled(true);
+                            }
+
+                            mImageAdapter.notifyDataSetChanged();
                             invalidateOptionsMenu();
                         }
                     });
                 }
             }
         });
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(LostDetailActivity.this, 3);
-        mImageAdapter = new ImageAdapter(imgPaths);
-        images.setLayoutManager(gridLayoutManager);
-        images.setAdapter(mImageAdapter);
 
         address = getString(R.string.server_ip) + "viewPointServlet";
         requestBody = new FormBody.Builder()
@@ -189,12 +201,6 @@ public class LostDetailActivity extends AppCompatActivity {
             }
         });
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        mViewPointAdapter = new ViewPointAdapter(mViewPointItems);
-        viewPoint.setLayoutManager(linearLayoutManager);
-        viewPoint.setAdapter(mViewPointAdapter);
-
-
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -239,6 +245,7 @@ public class LostDetailActivity extends AppCompatActivity {
                         });
                     }
                 });
+                builder.show();
             }
         });
 
@@ -378,14 +385,24 @@ public class LostDetailActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(LostDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LostDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(LostDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LostDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -401,14 +418,24 @@ public class LostDetailActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(LostDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LostDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(LostDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LostDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -424,14 +451,24 @@ public class LostDetailActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(LostDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LostDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(LostDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LostDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -450,14 +487,24 @@ public class LostDetailActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(LostDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LostDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(LostDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LostDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });

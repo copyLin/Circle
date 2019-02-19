@@ -3,6 +3,8 @@ package com.example.linxl.circle;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
@@ -46,11 +48,31 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     static final int LOADING_MORE = 0;
     static final int NO_MORE = 1;
 
+    static final int CONTROL_SUCCESS = 0;
+    static final int CONTROL_FAIL = 1;
+
+
     private int footer_state = 0;
     private Context mContext;
     private List<QuestionItem> mQuestionItems;
 
     private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message message) {
+            switch (message.what) {
+                case CONTROL_SUCCESS:
+                    Toast.makeText(MyApplication.getContext(), "操作成功", Toast.LENGTH_SHORT).show();
+                    break;
+                case CONTROL_FAIL:
+                    Toast.makeText(MyApplication.getContext(), "操作失败", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     class NormalViewHolder extends RecyclerView.ViewHolder{
 
@@ -69,7 +91,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             userName = (TextView) view.findViewById(R.id.user_name);
             sendTime = (TextView) view.findViewById(R.id.send_time);
             questionContent = (TextView) view.findViewById(R.id.question_content);
-            mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+            mRecyclerView = (RecyclerView) view.findViewById(R.id.question_images);
             moreButton = (ImageButton) view.findViewById(R.id.button_more);
         }
     }
@@ -98,11 +120,12 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_my_question, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            int position = holder.getAdapterPosition();
-            final QuestionItem questionItem = mQuestionItems.get(position);
+
             holder.moreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    final QuestionItem questionItem = mQuestionItems.get(position);
                     PopupMenu popupMenu = new PopupMenu(mContext,v);
                     popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
                     popupMenu.show();
@@ -196,12 +219,11 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
                     if (questionItem.isFlag()){
                         popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
-                        popupMenu.getMenu().getItem(R.id.open).setVisible(true);
+                        popupMenu.getMenu().findItem(R.id.open).setVisible(true);
                     }else {
                         popupMenu.getMenu().findItem(R.id.hide).setVisible(true);
-                        popupMenu.getMenu().getItem(R.id.open).setVisible(false);
+                        popupMenu.getMenu().findItem(R.id.open).setVisible(false);
                     }
-
 
                 }
             });
@@ -209,6 +231,8 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    QuestionItem questionItem = mQuestionItems.get(position);
                     Intent intent = new Intent(mContext, QuestionDetailActivity.class);
                     intent.putExtra("keyId", questionItem.getQuestionId());
                     intent.putExtra("label", "Question");
@@ -236,7 +260,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + questionItem.getUserImg()).into(((NormalViewHolder) holder).mCircleImageView);
 
-            if (questionItem.getQuestionImgs() != null){
+            if (!questionItem.getQuestionImgs().isEmpty()){
                 List<String> imgPaths = new ArrayList<>();
                 for (String imgPath : questionItem.getQuestionImgs()){
                     imgPaths.add(mContext.getResources().getString(R.string.server_ip) + "image/" + questionItem.getUserId() + "/" + imgPath);
@@ -295,14 +319,19 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "操作失败", Toast.LENGTH_SHORT).show();
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(mContext, responseData, Toast.LENGTH_SHORT).show();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
                 }
             }
         });
@@ -318,14 +347,19 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "操作失败", Toast.LENGTH_SHORT).show();
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(mContext, responseData, Toast.LENGTH_SHORT).show();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
                 }
             }
         });
@@ -341,14 +375,19 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "操作失败", Toast.LENGTH_SHORT).show();
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(mContext, responseData, Toast.LENGTH_SHORT).show();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
                 }
             }
         });
@@ -367,14 +406,19 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "操作失败", Toast.LENGTH_SHORT).show();
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(mContext, responseData, Toast.LENGTH_SHORT).show();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
                 }
             }
         });
