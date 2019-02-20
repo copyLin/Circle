@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/toolbarMain</item>
         <item name="colorPrimaryDark">@color/toolbarBackground</item>
         <item name="colorAccent">@color/colorTheme</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" >

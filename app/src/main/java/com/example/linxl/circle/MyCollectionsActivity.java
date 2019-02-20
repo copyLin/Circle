@@ -1,9 +1,13 @@
 package com.example.linxl.circle;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.CollectionItem;
@@ -41,6 +45,16 @@ public class MyCollectionsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_collections);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+        }
+
+        requestForMyCollection();
+
         allItems = new ArrayList<>();
         layoutManager = new LinearLayoutManager(this);
         adapter = new MyCollectionsAdapter(allItems);
@@ -53,7 +67,7 @@ public class MyCollectionsActivity extends AppCompatActivity {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem + 1 == adapter.getItemCount() && hasMore) {
-                    requestForMyQuestion();
+                    requestForMyCollection();
                 }
             }
 
@@ -66,7 +80,7 @@ public class MyCollectionsActivity extends AppCompatActivity {
         });
     }
 
-    private void requestForMyQuestion() {
+    private void requestForMyCollection() {
         String address = getString(R.string.server_ip) + "myCollectionServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("userId", (String) SPUtil.getParam(this, SPUtil.USER_ID, ""))
@@ -116,5 +130,17 @@ public class MyCollectionsActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 }

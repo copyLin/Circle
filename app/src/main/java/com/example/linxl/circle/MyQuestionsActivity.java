@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.QuestionItem;
@@ -130,5 +131,16 @@ public class MyQuestionsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
 
 }

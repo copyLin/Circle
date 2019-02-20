@@ -73,7 +73,7 @@ public class ViewPointAdapter extends RecyclerView.Adapter<ViewPointAdapter.View
         holder.userName.setText(item.getUserName());
         holder.content.setText(item.getContent());
         holder.sendTime.setText(item.getSendTime());
-        Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "user_img/" + item.getUserImg()).into(holder.mCircleImageView);
+        Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + item.getUserImg()).into(holder.mCircleImageView);
     }
 
     @Override

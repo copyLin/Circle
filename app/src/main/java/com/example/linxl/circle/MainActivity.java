@@ -60,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        CircleImageView userImage = navigationView.getHeaderView(0).findViewById(R.id.user_image);
-        TextView userName = navigationView.getHeaderView(0).findViewById(R.id.user_name);
+        View navHeader = navigationView.inflateHeaderView(R.layout.header_drawer_nav);
+        CircleImageView userImage = navHeader.findViewById(R.id.user_image);
+        TextView userName = navHeader.findViewById(R.id.user_name);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.float_button);

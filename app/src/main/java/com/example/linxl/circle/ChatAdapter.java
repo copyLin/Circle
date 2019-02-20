@@ -27,29 +27,29 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context mContext;
     private List<ChatItem> mChatItems;
     private String contactImg;
-    private String userId = (String) SPUtil.getParam(mContext, SPUtil.USER_ID, "");
-    private String userImg = (String) SPUtil.getParam(mContext, SPUtil.USER_IMG, "");
+    private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
+    private String userImg = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_IMG, "");
 
     class LeftViewHolder extends RecyclerView.ViewHolder {
 
-        CircleImageView userImg;
+        CircleImageView userImgView;
         TextView content;
 
         public LeftViewHolder(View view){
             super(view);
-            userImg = (CircleImageView) view.findViewById(R.id.user_img_left);
+            userImgView = (CircleImageView) view.findViewById(R.id.user_img_left);
             content = (TextView) view.findViewById(R.id.left_msg);
         }
     }
 
     class RightViewHolder extends RecyclerView.ViewHolder {
 
-        CircleImageView userImg;
+        CircleImageView userImgView;
         TextView content;
 
         public RightViewHolder(View view){
             super(view);
-            userImg = (CircleImageView) view.findViewById(R.id.user_img_right);
+            userImgView = (CircleImageView) view.findViewById(R.id.user_img_right);
             content = (TextView) view.findViewById(R.id.right_msg);
         }
     }
@@ -80,10 +80,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ChatItem item = mChatItems.get(position);
         if (holder instanceof LeftViewHolder) {
-            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "user_img/" + contactImg).into(((LeftViewHolder) holder).userImg);
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + contactImg).into(((LeftViewHolder) holder).userImgView);
             ((LeftViewHolder) holder).content.setText(item.getContent());
         }else if (holder instanceof RightViewHolder) {
-            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "user_img/" + userImg).into(((RightViewHolder) holder).userImg);
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + userImg).into(((RightViewHolder) holder).userImgView);
             ((RightViewHolder) holder).content.setText(item.getContent());
         }
     }

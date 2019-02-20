@@ -182,6 +182,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                 case R.id.like:
                                     final EditText name = new EditText(mContext);
                                     android.support.v7.app.AlertDialog.Builder dialog4 = new android.support.v7.app.AlertDialog.Builder(mContext);
+                                    dialog4.setTitle("添加到收藏夹");
                                     dialog4.setView(name);
                                     dialog4.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override

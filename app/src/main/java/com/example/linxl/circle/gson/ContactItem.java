@@ -54,4 +54,6 @@ public class ContactItem {
     public void setRecentChat(String recentChat) {
         this.recentChat = recentChat;
     }
+
+
 }

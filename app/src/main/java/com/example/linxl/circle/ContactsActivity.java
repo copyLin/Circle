@@ -26,13 +26,14 @@ import okhttp3.Response;
 
 public class ContactsActivity extends AppCompatActivity {
 
+    private RecyclerView mRecyclerView;
     private List<ContactItem> mContactItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -42,10 +43,6 @@ public class ContactsActivity extends AppCompatActivity {
         }
 
         requestForContact();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        ContactAdapter adapter = new ContactAdapter(mContactItems);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
 
     }
 
@@ -69,8 +66,24 @@ public class ContactsActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     final String responseData = response.body().string();
+                    if (responseData.equals("NoData")){
+                        Toast.makeText(ContactsActivity.this, "尚未有用户向您发送私信", Toast.LENGTH_SHORT).show();
+                    }else {
                         Gson gson = new Gson();
-                        mContactItems = gson.fromJson(responseData, new TypeToken<List<ContactItem>>(){}.getType());
+                        mContactItems = gson.fromJson(responseData,
+                                new TypeToken<List<ContactItem>>(){}.getType());
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LinearLayoutManager layoutManager = new LinearLayoutManager(ContactsActivity.this);
+                                ContactAdapter adapter = new ContactAdapter(mContactItems);
+                                mRecyclerView.setLayoutManager(layoutManager);
+                                mRecyclerView.setAdapter(adapter);
+                            }
+                        });
+                    }
+
                 }
             }
         });

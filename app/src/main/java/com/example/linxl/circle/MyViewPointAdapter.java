@@ -89,11 +89,12 @@ public class MyViewPointAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_viewpoint_with_tip, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            int position = holder.getAdapterPosition();
-            final ViewPointItem viewPointItem = mViewPointItems.get(position);
+
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    ViewPointItem viewPointItem = mViewPointItems.get(position);
                     Intent intent = null;
                     switch (viewPointItem.getLabel()){
                         case "Question":
@@ -121,6 +122,8 @@ public class MyViewPointAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             holder.mCardView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    final ViewPointItem viewPointItem = mViewPointItems.get(position);
                     PopupMenu popupMenu = new PopupMenu(mContext,v);
                     popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
                     popupMenu.show();

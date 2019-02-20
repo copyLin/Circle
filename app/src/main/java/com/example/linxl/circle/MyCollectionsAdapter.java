@@ -56,7 +56,7 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
         public NormalViewHolder(View view){
             super(view);
             mCardView = (CardView) view;
-            mCircleImageView = (CircleImageView) view.findViewById(R.id.user_image);
+            mCircleImageView = (CircleImageView) view.findViewById(R.id.collection_label);
             collectionName = (TextView) view.findViewById(R.id.collection_name);
             collectionTime = (TextView) view.findViewById(R.id.collection_time);
         }
@@ -86,11 +86,12 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_my_collection, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            int position = holder.getAdapterPosition();
-            final CollectionItem collectionItem = mCollectionItems.get(position);
+
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    CollectionItem collectionItem = mCollectionItems.get(position);
                     Intent intent = null;
                     switch (collectionItem.getLabel()){
                         case "Question":
@@ -118,6 +119,8 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
             holder.mCardView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
+                    int position = holder.getAdapterPosition();
+                    final CollectionItem collectionItem = mCollectionItems.get(position);
                     PopupMenu popupMenu = new PopupMenu(mContext,v);
                     popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
                     popupMenu.show();
@@ -178,7 +181,7 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
             ((NormalViewHolder) holder).collectionName.setText(collectionItem.getCollectionName());
             ((NormalViewHolder) holder).collectionTime.setText(collectionItem.getCollectionTime());
 
-            Glide.with(mContext).load("").into(((NormalViewHolder) holder).mCircleImageView);
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/label/" + collectionItem.getLabel() + ".jpg").into(((NormalViewHolder) holder).mCircleImageView);
 
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {
@@ -199,8 +202,8 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     @Override
-    public int getItemViewType(int positon){
-        if (positon == getItemCount() - 1) {
+    public int getItemViewType(int position){
+        if (position == getItemCount() - 1) {
             return TYPE_FOOTER;
         }
         return TYPE_NORMAL;

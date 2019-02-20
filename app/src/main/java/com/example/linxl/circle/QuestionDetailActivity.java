@@ -88,120 +88,15 @@ public class QuestionDetailActivity extends AppCompatActivity {
         String label = intent.getStringExtra("label");
         userId = intent.getStringExtra("userId");
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(QuestionDetailActivity.this, 3);
-        mImageAdapter = new ImageAdapter(imgPaths);
-        images.setLayoutManager(gridLayoutManager);
-        images.setAdapter(mImageAdapter);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        mViewPointAdapter = new ViewPointAdapter(mViewPointItems);
-        viewPoint.setLayoutManager(linearLayoutManager);
-        viewPoint.setAdapter(mViewPointAdapter);
-
-        String address = getString(R.string.server_ip) + "itemDetailServlet";
-        RequestBody requestBody = new FormBody.Builder()
-                .add("keyId", keyId)
-                .add("label", label)
-                .build();
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(QuestionDetailActivity.this, "内容加载失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-                    Gson gson = new Gson();
-                    mQuestionItem = gson.fromJson(responseData, QuestionItem.class);
-
-                    Log.d("————QuesDetail————", "item: " + mQuestionItem);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            userName.setText(mQuestionItem.getUserName());
-                            sendTime.setText(mQuestionItem.getSendTime());
-                            content.setText(mQuestionItem.getContent());
-                            Glide.with(QuestionDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mQuestionItem.getUserImg()).into(mCircleImageView);
-
-                            if (!mQuestionItem.getQuestionImgs().isEmpty()){
-                                for (String imgPath : mQuestionItem.getQuestionImgs()){
-                                    imgPaths.add(getString(R.string.server_ip) + "image/" + mQuestionItem.getUserId() + "/" + imgPath);
-                                }
-                            }
-
-                            if (mQuestionItem.getUserId().equals(myId)){
-                                connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
-                                connectButton.setEnabled(false);
-                            }else {
-                                connectButton.setBackgroundResource(R.drawable.ic_connect);
-                                connectButton.setEnabled(true);
-                            }
-
-                            mImageAdapter.notifyDataSetChanged();
-                            invalidateOptionsMenu();
-                        }
-                    });
-                }
-            }
-        });
-
-        address = getString(R.string.server_ip) + "viewPointServlet";
-        requestBody = new FormBody.Builder()
-                .add("keyId", keyId)
-                .add("label", label)
-                .build();
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(QuestionDetailActivity.this, "评论加载失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()){
-                    String responseData = response.body().string();
-                    if (responseData.equals("NoData")){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(QuestionDetailActivity.this, "暂时没有评论", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }else {
-                        Gson gson = new Gson();
-                        mViewPointItems = gson.fromJson(responseData,
-                                new TypeToken<List<ViewPointItem>>() {
-                                }.getType());
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mViewPointAdapter.notifyDataSetChanged();
-                            }
-                        });
-                    }
-                }
-            }
-        });
+        getItemDetail(keyId, label);
+        getItemViewPoint(keyId, label);
 
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final EditText content = new EditText(QuestionDetailActivity.this);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(QuestionDetailActivity.this);
+                builder.setTitle("评论");
                 builder.setView(content);
                 builder.setPositiveButton("发表", new DialogInterface.OnClickListener() {
                     @Override
@@ -352,6 +247,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
             case R.id.like:
                 final EditText name = new EditText(this);
                 AlertDialog.Builder dialog4 = new android.support.v7.app.AlertDialog.Builder(this);
+                dialog4.setTitle("添加到收藏夹");
                 dialog4.setView(name);
                 dialog4.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
@@ -373,6 +269,117 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    private void getItemDetail(String keyId, String label){
+        String address = getString(R.string.server_ip) + "itemDetailServlet";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("keyId", keyId)
+                .add("label", label)
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(QuestionDetailActivity.this, "内容加载失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseData = response.body().string();
+                    Gson gson = new Gson();
+                    mQuestionItem = gson.fromJson(responseData, QuestionItem.class);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            userName.setText(mQuestionItem.getUserName());
+                            sendTime.setText(mQuestionItem.getSendTime());
+                            content.setText(mQuestionItem.getContent());
+                            Glide.with(QuestionDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mQuestionItem.getUserImg()).into(mCircleImageView);
+
+                            if (!mQuestionItem.getQuestionImgs().isEmpty()){
+                                for (String imgPath : mQuestionItem.getQuestionImgs()){
+                                    imgPaths.add(getString(R.string.server_ip) + "image/" + mQuestionItem.getUserId() + "/" + imgPath);
+                                }
+                            }
+
+                            if (mQuestionItem.getUserId().equals(myId)){
+                                connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
+                                connectButton.setEnabled(false);
+                            }else {
+                                connectButton.setBackgroundResource(R.drawable.ic_connect);
+                                connectButton.setEnabled(true);
+                            }
+
+                            GridLayoutManager gridLayoutManager = new GridLayoutManager(QuestionDetailActivity.this, 3);
+                            mImageAdapter = new ImageAdapter(imgPaths);
+                            images.setLayoutManager(gridLayoutManager);
+                            images.setAdapter(mImageAdapter);
+
+                            invalidateOptionsMenu();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void getItemViewPoint(String keyId, String label){
+        String address = getString(R.string.server_ip) + "viewPointServlet";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("keyId", keyId)
+                .add("label", label)
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(QuestionDetailActivity.this, "评论加载失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+                    if (responseData.equals("NoData")){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(QuestionDetailActivity.this, "暂时没有评论", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }else {
+                        Gson gson = new Gson();
+                        mViewPointItems = gson.fromJson(responseData,
+                                new TypeToken<List<ViewPointItem>>() {
+                                }.getType());
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(QuestionDetailActivity.this);
+                                mViewPointAdapter = new ViewPointAdapter(mViewPointItems);
+                                viewPoint.setLayoutManager(linearLayoutManager);
+                                viewPoint.setAdapter(mViewPointAdapter);
+
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
     }
 
     private void deleteMyQuestion(String userId, String sendTime) {
