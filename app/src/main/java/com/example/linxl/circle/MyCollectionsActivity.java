@@ -53,14 +53,14 @@ public class MyCollectionsActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
         }
 
-        requestForMyCollection();
-
         allItems = new ArrayList<>();
         layoutManager = new LinearLayoutManager(this);
         adapter = new MyCollectionsAdapter(allItems);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
+
+        requestForMyCollection();
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

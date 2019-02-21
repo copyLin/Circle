@@ -66,7 +66,6 @@ public class LoginActivity extends AppCompatActivity {
                                         case "LoginSuccess":
                                             String id = userId.getText().toString();
                                             requestForUserInformation(id);
-                                            LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                             Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                                             finish();
                                             break;
@@ -113,9 +112,15 @@ public class LoginActivity extends AppCompatActivity {
                     Gson gson = new Gson();
                     user = gson.fromJson(responseData, UserItem.class);
                     SPUtil.setParam(LoginActivity.this, SPUtil.USER_ID, user.getUserId());
-                    SPUtil.getParam(LoginActivity.this, SPUtil.USER_NAME, user.getUserName());
-                    SPUtil.getParam(LoginActivity.this, SPUtil.USER_IMG, user.getUserImg());
+                    SPUtil.setParam(LoginActivity.this, SPUtil.USER_NAME, user.getUserName());
+                    SPUtil.setParam(LoginActivity.this, SPUtil.USER_IMG, user.getUserImg());
                     SPUtil.setParam(LoginActivity.this, SPUtil.IS_LOGIN, true);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        }
+                    });
                 }
             }
         });

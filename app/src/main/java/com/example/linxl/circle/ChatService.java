@@ -58,6 +58,7 @@ public class ChatService extends Service {
                         if (socket.isConnected()) {
                             if (!socket.isOutputShutdown()) {
                                 String jsonData  = mGson.toJson(item);
+                                Log.d("———ChatService———", "jsonData" + jsonData);
                                 out.write(jsonData + "\n");
                                 out.flush();
 
@@ -175,8 +176,8 @@ public class ChatService extends Service {
     private void connection() {
         try {
             socket = new Socket(HOST, PORT);
-            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8"));
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf-8"));
             out.write("enter:" + userId + "\n");
             out.flush();
         } catch (IOException e) {

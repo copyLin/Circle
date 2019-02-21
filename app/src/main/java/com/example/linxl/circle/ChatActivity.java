@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -185,6 +186,9 @@ public class ChatActivity extends AppCompatActivity {
                                 new TypeToken<List<ChatItem>>(){}.getType());
                         ChatItem chatItem = items.get(items.size() - 1);
                         currentId = chatItem.getId();
+
+                        Log.d("———ChatActivity———", "id & items" + currentId + items);
+
                         for (ChatItem item : items) {
                             mChatItems.add(0, item);
                         }

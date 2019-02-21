@@ -52,14 +52,14 @@ public class MyViewPointActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
         }
 
-        requestForMyViewPoint();
-
         allItems = new ArrayList<>();
         layoutManager = new LinearLayoutManager(this);
         adapter = new MyViewPointAdapter(allItems);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(adapter);
+
+        requestForMyViewPoint();
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
