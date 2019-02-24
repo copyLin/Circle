@@ -6,10 +6,10 @@
     tools:context="com.example.linxl.circle.WelcomeActivity">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/welcome_image"
-        android:scaleType="centerCrop"/>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:src="@drawable/welcome_image"
+    android:scaleType="centerCrop"/>
 
     <ImageView
         android:layout_margin="16dp"

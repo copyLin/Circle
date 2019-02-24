@@ -116,7 +116,7 @@ public class MyCollectionsActivity extends AppCompatActivity {
                         items = gson.fromJson(responseData,
                                 new TypeToken<List<CollectionItem>>(){}.getType());
                         CollectionItem item = items.get(items.size() - 1);
-                        currentId = item.getCollectionId();
+                        currentId = String.valueOf(item.getCollectionId());
                         allItems.addAll(items);
                         runOnUiThread(new Runnable() {
                             @Override

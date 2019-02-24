@@ -43,10 +43,20 @@
     <string name="menu_hide">仅自己可见</string>
     <string name="menu_like">收藏</string>
     <string name="menu_report">举报</string>
+    <string name="menu_setting">设置</string>
+    <string name="menu_change">修改</string>
+    <string name="menu_done">完成</string>
+    <string name="change_password">修改密码</string>
+    <string name="logout">退出登录</string>
+    <string name="old_password">原始密码：</string>
+    <string name="new_password">新密码：</string>
+    <string name="confirm_password">确认密码：</string>
 
     <string-array name="label_spinner">
-        <item>LOST</item>
-        <item>FOUND</item>
+        <item>校园话题</item>
+        <item>寻物启事</item>
+        <item>闲置物品</item>
+        <item>校园跑腿</item>
     </string-array>
 
     <string-array name="time_spinner">
@@ -55,4 +65,5 @@
         <item>12:00—18:00</item>
         <item>18:00—24:00</item>
     </string-array>
+
 </resources>

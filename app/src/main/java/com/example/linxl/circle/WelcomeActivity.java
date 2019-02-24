@@ -5,8 +5,22 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.example.linxl.circle.gson.CollectionItem;
+import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
+import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -38,4 +52,5 @@ public class WelcomeActivity extends AppCompatActivity {
             finish();
         }
     }
+
 }

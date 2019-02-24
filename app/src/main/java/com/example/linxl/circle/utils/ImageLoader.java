@@ -122,4 +122,8 @@ public class ImageLoader {
         }
         return path;
     }
+
+    public Uri getImageUri(){
+        return imageUri;
+    }
 }

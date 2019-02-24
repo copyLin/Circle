@@ -185,7 +185,7 @@ public class ChatActivity extends AppCompatActivity {
                         List<ChatItem> items = gson.fromJson(responseData,
                                 new TypeToken<List<ChatItem>>(){}.getType());
                         ChatItem chatItem = items.get(items.size() - 1);
-                        currentId = chatItem.getId();
+                        currentId = String.valueOf(chatItem.getId());
 
                         Log.d("———ChatActivity———", "id & items" + currentId + items);
 

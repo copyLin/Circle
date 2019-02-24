@@ -1,15 +1,16 @@
 package com.example.linxl.circle;
 
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,7 +38,6 @@ public class HomepageActivity extends AppCompatActivity {
     private TextView userDepartment;
     private TextView userMajor;
     private TextView userWords;
-    private Button changePassword;
     private FloatingActionButton editInfo;
     private UserItem mUser;
 
@@ -54,7 +54,6 @@ public class HomepageActivity extends AppCompatActivity {
         userDepartment = (TextView) findViewById(R.id.user_department);
         userMajor = (TextView) findViewById(R.id.user_major);
         userWords = (TextView) findViewById(R.id.user_words);
-        changePassword = (Button) findViewById(R.id.change_password);
         editInfo = (FloatingActionButton) findViewById(R.id.button_edit);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -66,6 +65,50 @@ public class HomepageActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
+        getUserInformation();
+
+        editInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.info_layout, new EditInfoFragment());
+                transaction.addToBackStack(null);
+                transaction.commit();
+                editInfo.setImageResource(R.drawable.ic_send);
+            }
+        });
+
+        mCircleImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomepageActivity.this, UserImageActivity.class));
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_homepage, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            case R.id.setting:
+                startActivity(new Intent(HomepageActivity.this, SettingActivity.class));
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    private void getUserInformation(){
         String address = getString(R.string.server_ip) + "userInformation";
         RequestBody requestBody = new FormBody.Builder()
                 .add("userId", id)
@@ -102,79 +145,5 @@ public class HomepageActivity extends AppCompatActivity {
 
             }
         });
-
-        changePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final EditText oldPassword = new EditText(HomepageActivity.this);
-                final EditText newPassword1 = new EditText(HomepageActivity.this);
-                final EditText newPassword2 = new EditText(HomepageActivity.this);
-                final AlertDialog.Builder dialog = new AlertDialog.Builder(HomepageActivity.this);
-                dialog.setView(oldPassword);
-                dialog.setView(newPassword1);
-                dialog.setView(newPassword2);
-                dialog.setPositiveButton("修改", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String address = getString(R.string.server_ip) + "changePassword";
-                        RequestBody requestBody = new FormBody.Builder()
-                                .add("userId", id)
-                                .add("oldPassword", oldPassword.getText().toString())
-                                .add("newPassword1", newPassword1.getText().toString())
-                                .add("newPassword2", newPassword2.getText().toString())
-                                .build();
-                        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(HomepageActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-                                if (response.isSuccessful()){
-                                    final String responseData = response.body().string();
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(HomepageActivity.this, responseData, Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });
-                dialog.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-            }
-        });
-
-        editInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                break;
-            default:
-                break;
-        }
-        return true;
     }
 }

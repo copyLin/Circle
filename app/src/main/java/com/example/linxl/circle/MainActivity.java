@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.search_message:
-                Toast.makeText(this, "点击搜索", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this, SearchActivity.class));
                 break;
             case  R.id.new_question:
                 startActivity(new Intent(MainActivity.this, NewQuestionActivity.class));

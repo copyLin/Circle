@@ -35,8 +35,12 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.0'
     implementation 'com.github.chrisbanes.photoview:library:1.2.4'
     implementation 'org.litepal.android:core:1.4.1'
+    implementation 'com.soundcloud.android.crop:lib_crop:1.0.0'
 }
 
-tasks.withType (JavaCompile){
+
+
+
+tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }

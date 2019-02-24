@@ -59,6 +59,7 @@ public class LostDetailActivity extends AppCompatActivity {
     private List<String> imgPaths;
     private List<ViewPointItem> mViewPointItems;
 
+    private boolean collectionState = false;
     private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
     private String userId;
 
@@ -95,6 +96,7 @@ public class LostDetailActivity extends AppCompatActivity {
 
         getItemDetali(keyId, label);
         getItemViewPoint(keyId, label);
+        getCollectionState(keyId, label);
 
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,6 +189,11 @@ public class LostDetailActivity extends AppCompatActivity {
             menu.findItem(R.id.delete).setVisible(false);
             menu.findItem(R.id.hide).setVisible(false);
             menu.findItem(R.id.open).setVisible(false);
+        }
+        if (collectionState){
+            menu.findItem(R.id.like).setTitle("已收藏").setEnabled(false);
+        }else {
+            menu.findItem(R.id.like).setTitle("收藏").setEnabled(true);
         }
         return true;
     }
@@ -378,6 +385,47 @@ public class LostDetailActivity extends AppCompatActivity {
                             }
                         });
                     }
+                }
+            }
+        });
+    }
+
+    private void getCollectionState(String keyId, String label){
+        String address = this.getString(R.string.server_ip) + "collectionStateServlet";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("userId", myId)
+                .add("keyId", keyId)
+                .add("label", label)
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LostDetailActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String responseData = response.body().string();
+                    if (responseData.equals("StateTrue")){
+                        collectionState = true;
+                    }else if (responseData.equals("StateFalse")){
+                        collectionState = false;
+                    }else {
+                        collectionState = false;
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            invalidateOptionsMenu();
+                        }
+                    });
+
                 }
             }
         });

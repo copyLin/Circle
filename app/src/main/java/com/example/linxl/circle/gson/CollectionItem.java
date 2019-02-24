@@ -6,13 +6,13 @@ package com.example.linxl.circle.gson;
 
 public class CollectionItem {
 
-    private String collectionId;
+    private int collectionId;
     private String keyId;
     private String label;
     private String collectionName;
     private String collectionTime;
 
-    public CollectionItem(String collectionId, String keyId, String label, String collectionName,
+    public CollectionItem(int collectionId, String keyId, String label, String collectionName,
                           String collectionTime) {
         super();
         this.collectionId = collectionId;
@@ -22,11 +22,11 @@ public class CollectionItem {
         this.collectionTime = collectionTime;
     }
 
-    public String getCollectionId() {
+    public int getCollectionId() {
         return collectionId;
     }
 
-    public void setCollectionId(String collectionId) {
+    public void setCollectionId(int collectionId) {
         this.collectionId = collectionId;
     }
 

@@ -78,7 +78,6 @@ public class NewQuestionActivity extends AppCompatActivity {
         addImgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("—————— NewQuestion ————", "click the button");
                 final String[] items = {"拍摄", "从相册选择"};
                 AlertDialog.Builder dialog = new AlertDialog.Builder(NewQuestionActivity.this);
                 dialog.setItems(items, new DialogInterface.OnClickListener() {
@@ -102,6 +101,7 @@ public class NewQuestionActivity extends AppCompatActivity {
 
     }
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_new, menu);
         return true;

@@ -29,6 +29,7 @@
         <activity android:name=".HomepageActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity" />
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -58,7 +59,9 @@
         <activity android:name=".UnreadViewPointActivity" />
         <activity android:name=".MyViewPointActivity" />
         <activity android:name=".UserCardActivity" />
-        <activity android:name=".SearchResultActivity"></activity>
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".SettingActivity" />
+        <activity android:name=".UserImageActivity"></activity>
     </application>
 
 </manifest>
