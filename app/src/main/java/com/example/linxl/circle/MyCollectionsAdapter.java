@@ -3,6 +3,8 @@ package com.example.linxl.circle;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -40,11 +42,31 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
     static final int LOADING_MORE = 0;
     static final int NO_MORE = 1;
 
+    static final int CONTROL_SUCCESS = 0;
+    static final int CONTROL_FAIL = 1;
+
     private int footer_state = 0;
     private Context mContext;
     private List<CollectionItem> mCollectionItems;
 
     private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message message) {
+            switch (message.what) {
+                case CONTROL_SUCCESS:
+                    Toast.makeText(MyApplication.getContext(), "操作成功", Toast.LENGTH_SHORT).show();
+                    notifyDataSetChanged();
+                    break;
+                case CONTROL_FAIL:
+                    Toast.makeText(MyApplication.getContext(), "操作失败", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     class NormalViewHolder extends RecyclerView.ViewHolder{
 
@@ -134,7 +156,7 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
                                     dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            deleteMyCollection(String.valueOf(collectionItem.getCollectionId()));
+                                            deleteMyCollection(collectionItem);
                                         }
                                     });
                                     dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -222,22 +244,29 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
         notifyDataSetChanged();
     }
 
-    private void deleteMyCollection(String id) {
+    private void deleteMyCollection(final CollectionItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "deleteCollectionServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("id", id)
+                .add("id", String.valueOf(item.getCollectionId()))
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(mContext, "操作失败", Toast.LENGTH_SHORT).show();
+                Message message = new Message();
+                message.what = CONTROL_FAIL;
+                mHandler.sendMessage(message);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
                     String responseData = response.body().string();
-                    Toast.makeText(mContext, responseData, Toast.LENGTH_SHORT).show();
+
+                    Message message = new Message();
+                    message.what = CONTROL_SUCCESS;
+                    mHandler.sendMessage(message);
+
+                    mCollectionItems.remove(item);
                 }
             }
         });

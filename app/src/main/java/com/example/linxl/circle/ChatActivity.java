@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.ChatItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.TimeCapture;
 import com.google.gson.Gson;
@@ -76,6 +77,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_chat);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -211,6 +213,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onDestroy();
         unbindService(mConnection);
         mLocalBroadcastManager.unregisterReceiver(mChatReceiver);
+        ActivityCollector.removeAvtivity(this);
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.LostItem;
 import com.example.linxl.circle.gson.ViewPointItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 import com.example.linxl.circle.utils.TimeCapture;
@@ -62,10 +64,13 @@ public class LostDetailActivity extends AppCompatActivity {
     private boolean collectionState = false;
     private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
     private String userId;
+    private String keyId;
+    private String label;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_lost_detail);
         mCircleImageView = (CircleImageView) findViewById(R.id.user_image);
         userName = (TextView) findViewById(R.id.user_name);
@@ -90,11 +95,11 @@ public class LostDetailActivity extends AppCompatActivity {
         }
 
         Intent intent = getIntent();
-        String keyId = intent.getStringExtra("keyId");
-        String label = intent.getStringExtra("label");
+        keyId = intent.getStringExtra("keyId");
+        label = intent.getStringExtra("label");
         userId = intent.getStringExtra("userId");
 
-        getItemDetali(keyId, label);
+        getItemDetail(keyId, label);
         getItemViewPoint(keyId, label);
         getCollectionState(keyId, label);
 
@@ -135,7 +140,8 @@ public class LostDetailActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(LostDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(LostDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
+                                            getItemViewPoint(keyId, label);
                                         }
                                     });
                                 }
@@ -263,7 +269,7 @@ public class LostDetailActivity extends AppCompatActivity {
                 dialog4.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        addCollection(name.getText().toString(), mLostItem.getUserId(), mLostItem.getLostId());
+                        addCollection(name.getText().toString(), myId, mLostItem.getLostId());
                     }
                 });
                 dialog4.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -280,7 +286,7 @@ public class LostDetailActivity extends AppCompatActivity {
         return true;
     }
 
-    private void getItemDetali(String keyId, String label){
+    private void getItemDetail(String keyId, String label){
         String address = getString(R.string.server_ip) + "itemDetailServlet";
         RequestBody requestBody = new FormBody.Builder()
                 .add("keyId", keyId)
@@ -563,5 +569,11 @@ public class LostDetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

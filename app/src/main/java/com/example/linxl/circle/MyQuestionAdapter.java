@@ -51,7 +51,6 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     static final int CONTROL_SUCCESS = 0;
     static final int CONTROL_FAIL = 1;
 
-
     private int footer_state = 0;
     private Context mContext;
     private List<QuestionItem> mQuestionItems;
@@ -64,6 +63,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             switch (message.what) {
                 case CONTROL_SUCCESS:
                     Toast.makeText(MyApplication.getContext(), "操作成功", Toast.LENGTH_SHORT).show();
+                    notifyDataSetChanged();
                     break;
                 case CONTROL_FAIL:
                     Toast.makeText(MyApplication.getContext(), "操作失败", Toast.LENGTH_SHORT).show();
@@ -126,7 +126,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 public void onClick(View v) {
                     int position = holder.getAdapterPosition();
                     final QuestionItem questionItem = mQuestionItems.get(position);
-                    PopupMenu popupMenu = new PopupMenu(mContext,v);
+                    final PopupMenu popupMenu = new PopupMenu(mContext,v);
                     popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
                     popupMenu.show();
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -139,7 +139,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                     dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            deleteMyQuestion(questionItem.getUserId(), questionItem.getSendTime());
+                                            deleteMyQuestion(questionItem);
                                         }
                                     });
                                     dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -156,7 +156,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                     dialog2.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            hideMyQuestion(questionItem.getUserId(), questionItem.getSendTime());
+                                            hideMyQuestion(questionItem);
                                         }
                                     });
                                     dialog2.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -173,7 +173,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                     dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            openMyQuestion(questionItem.getUserId(), questionItem.getSendTime());
+                                            openMyQuestion(questionItem);
                                         }
                                     });
                                     dialog3.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -184,9 +184,8 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                     });
                                     dialog3.show();
                                     break;
-                                case R.id.report:
-                                    break;
                                 default:
+                                    break;
 
                             }
                             return true;
@@ -200,6 +199,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     });
 
                     popupMenu.getMenu().findItem(R.id.like).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.report).setVisible(false);
                     if (questionItem.isFlag()){
                         popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
                         popupMenu.getMenu().findItem(R.id.open).setVisible(true);
@@ -293,11 +293,11 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyDataSetChanged();
     }
 
-    private void deleteMyQuestion(String userId, String sendTime) {
+    private void deleteMyQuestion(final QuestionItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "deleteQuestionServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -315,16 +315,18 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
+
+                    mQuestionItems.remove(item);
                 }
             }
         });
     }
 
-    private void hideMyQuestion(String userId, String sendTime) {
+    private void hideMyQuestion(final QuestionItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateQuestionFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -343,16 +345,18 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
+
+                    item.setFlag(true);
                 }
             }
         });
     }
 
-    private void openMyQuestion(String userId, String sendTime) {
+    private void openMyQuestion(final QuestionItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateQuestionFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -371,37 +375,8 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
-                }
-            }
-        });
-    }
 
-    private void addCollection(String name, String userId, String keyId) {
-        String sendTime = TimeCapture.getChinaTime();
-        String address = mContext.getResources().getString(R.string.server_ip) + "newCollectionServlet";
-        RequestBody requestBody = new FormBody.Builder()
-                .add("name", name)
-                .add("userId", userId)
-                .add("collectionTime", sendTime)
-                .add("keyId", keyId)
-                .add("label", "Question")
-                .build();
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message message = new Message();
-                message.what = CONTROL_FAIL;
-                mHandler.sendMessage(message);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
-                    Message message = new Message();
-                    message.what = CONTROL_SUCCESS;
-                    mHandler.sendMessage(message);
+                    item.setFlag(false);
                 }
             }
         });

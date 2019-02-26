@@ -7,6 +7,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.example.linxl.circle.utils.ActivityCollector;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class ImageDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_image_detail);
 
         Intent intent = getIntent();
@@ -49,5 +52,11 @@ public class ImageDetailActivity extends AppCompatActivity {
             }
         });
         viewPager.setCurrentItem(position);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

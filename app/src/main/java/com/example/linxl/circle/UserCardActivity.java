@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.UserItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.google.gson.Gson;
 
@@ -38,6 +39,7 @@ public class UserCardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_user_card);
 
         mCircleImageView= (CircleImageView) findViewById(R.id.user_image);
@@ -107,5 +109,11 @@ public class UserCardActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

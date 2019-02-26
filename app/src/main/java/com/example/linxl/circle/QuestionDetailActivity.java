@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.CollectionItem;
 import com.example.linxl.circle.gson.QuestionItem;
 import com.example.linxl.circle.gson.ViewPointItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 import com.example.linxl.circle.utils.TimeCapture;
@@ -61,10 +62,13 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private boolean collectionState = false;
     private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
     private String userId;
+    private String keyId;
+    private String label;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_question_detail);
         mCircleImageView = (CircleImageView) findViewById(R.id.user_image);
         userName = (TextView) findViewById(R.id.user_name);
@@ -86,8 +90,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
         }
 
         Intent intent = getIntent();
-        String keyId = intent.getStringExtra("keyId");
-        String label = intent.getStringExtra("label");
+        keyId = intent.getStringExtra("keyId");
+        label = intent.getStringExtra("label");
         userId = intent.getStringExtra("userId");
 
         getItemDetail(keyId, label);
@@ -119,7 +123,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toast.makeText(QuestionDetailActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(QuestionDetailActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }
@@ -131,7 +135,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(QuestionDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(QuestionDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
+                                            getItemViewPoint(keyId, label);
                                         }
                                     });
                                 }
@@ -260,7 +265,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 dialog4.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        addCollection(name.getText().toString(), mQuestionItem.getUserId(), mQuestionItem.getQuestionId());
+                        addCollection(name.getText().toString(), myId, mQuestionItem.getQuestionId());
                     }
                 });
                 dialog4.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -423,6 +428,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             invalidateOptionsMenu();
+
+                            Log.d("————QuesDetail————", "" + collectionState);
                         }
                     });
 
@@ -443,7 +450,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(QuestionDetailActivity.this, "操作失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(QuestionDetailActivity.this, "删除失败", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -455,7 +462,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(QuestionDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                            finish();
+                            Toast.makeText(QuestionDetailActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -484,11 +492,11 @@ public class QuestionDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(QuestionDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                            mQuestionItem.setFlag(true);
+                            invalidateOptionsMenu();
                         }
                     });
                 }
@@ -517,11 +525,11 @@ public class QuestionDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(QuestionDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                            mQuestionItem.setFlag(false);
+                            invalidateOptionsMenu();
                         }
                     });
                 }
@@ -557,11 +565,18 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(QuestionDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                            collectionState = true;
+                            invalidateOptionsMenu();
                         }
                     });
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

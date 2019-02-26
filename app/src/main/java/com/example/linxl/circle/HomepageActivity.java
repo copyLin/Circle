@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.UserItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
@@ -32,6 +34,10 @@ import okhttp3.Response;
 
 public class HomepageActivity extends AppCompatActivity {
 
+    private final int EDIT_BUTTON = 0;
+    private final int DONE_BUTTON = 1;
+    private int buttonState = EDIT_BUTTON;
+
     private CircleImageView mCircleImageView;
     private TextView userId;
     private TextView userName;
@@ -46,14 +52,15 @@ public class HomepageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_homepage);
 
         mCircleImageView = (CircleImageView) findViewById(R.id.user_image);
         userId = (TextView) findViewById(R.id.user_id);
-        userName = (TextView) findViewById(R.id.user_name);
-        userDepartment = (TextView) findViewById(R.id.user_department);
-        userMajor = (TextView) findViewById(R.id.user_major);
-        userWords = (TextView) findViewById(R.id.user_words);
+        userName = (EditText) findViewById(R.id.user_name);
+        userDepartment = (EditText) findViewById(R.id.user_department);
+        userMajor = (EditText) findViewById(R.id.user_major);
+        userWords = (EditText) findViewById(R.id.user_words);
         editInfo = (FloatingActionButton) findViewById(R.id.button_edit);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -66,16 +73,53 @@ public class HomepageActivity extends AppCompatActivity {
         }
 
         getUserInformation();
+        updateEditTextState();
 
         editInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.info_layout, new EditInfoFragment());
-                transaction.addToBackStack(null);
-                transaction.commit();
-                editInfo.setImageResource(R.drawable.ic_send);
+
+                if (getButtonState() == EDIT_BUTTON){
+                    editInfo.setImageResource(R.drawable.ic_send);
+                    setButtonState(DONE_BUTTON);
+                    updateEditTextState();
+
+                }else if (getButtonState() == DONE_BUTTON){
+                    String address = getString(R.string.server_ip) + "updateUserInfo";
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("userId", id)
+                            .add("userName", userName.getText().toString())
+                            .add("department", userDepartment.getText().toString())
+                            .add("major", userMajor.getText().toString())
+                            .add("words", userWords.getText().toString())
+                            .build();
+                    HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(HomepageActivity.this, "修改失败", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onResponse(Call call, final Response response) throws IOException {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    editInfo.setImageResource(R.drawable.ic_edit);
+                                    setButtonState(EDIT_BUTTON);
+                                    updateEditTextState();
+                                }
+                            });
+
+                        }
+                    });
+
+                }
+
             }
         });
 
@@ -145,5 +189,40 @@ public class HomepageActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d("—————Homepage—————", "onResume");
+    }
+
+    public int getButtonState() {
+        return buttonState;
+    }
+
+    public void setButtonState(int buttonState) {
+        this.buttonState = buttonState;
+    }
+
+    public void updateEditTextState(){
+        if (getButtonState() == EDIT_BUTTON){
+            userName.setEnabled(false);
+            userDepartment.setEnabled(false);
+            userMajor.setEnabled(false);
+            userWords.setEnabled(false);
+
+        }else if (getButtonState() == DONE_BUTTON){
+            userName.setEnabled(true);
+            userDepartment.setEnabled(true);
+            userMajor.setEnabled(true);
+            userWords.setEnabled(true);
+        }
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

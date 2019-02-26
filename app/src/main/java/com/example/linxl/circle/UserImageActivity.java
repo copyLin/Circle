@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.ImageLoader;
 import com.example.linxl.circle.utils.SPUtil;
@@ -36,6 +37,8 @@ import okhttp3.Response;
      public static final int TAKE_PHOTO = 0;
      public static final int CHOOSE_PHOTO = 1;
 
+     private boolean doneMenuState = false;
+
      private ImageView mImageView;
      private ImageLoader mImageLoader;
 
@@ -45,6 +48,7 @@ import okhttp3.Response;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_user_image);
         mImageView = (ImageView) findViewById(R.id.user_image);
         mImageLoader = new ImageLoader(this);
@@ -69,7 +73,11 @@ import okhttp3.Response;
 
      @Override
      public boolean onPrepareOptionsMenu(Menu menu){
-         menu.findItem(R.id.done).setVisible(true);
+         if (doneMenuState){
+             menu.findItem(R.id.done).setVisible(true);
+         }else {
+             menu.findItem(R.id.done).setVisible(false);
+         }
          return true;
      }
 
@@ -125,6 +133,8 @@ import okhttp3.Response;
                                  @Override
                                  public void run() {
                                      if (responseData.equals("Success")){
+                                         doneMenuState = false;
+                                         invalidateOptionsMenu();
                                          Toast.makeText(UserImageActivity.this, "修改成功", Toast.LENGTH_SHORT).show();
                                      }else {
                                          Toast.makeText(UserImageActivity.this, "修改失败", Toast.LENGTH_SHORT).show();
@@ -169,6 +179,7 @@ import okhttp3.Response;
                  imgPath = Crop.getOutput(data).getPath();
                  Glide.with(UserImageActivity.this).load(imgPath).into(mImageView);
                  SPUtil.setParam(UserImageActivity.this, SPUtil.USER_IMG, userId + ".jpg");
+                 doneMenuState = true;
                  invalidateOptionsMenu();
                  break;
              case Crop.RESULT_ERROR:
@@ -179,5 +190,9 @@ import okhttp3.Response;
          }
      }
 
-
+     @Override
+     protected void onDestroy(){
+         super.onDestroy();
+         ActivityCollector.removeAvtivity(this);
+     }
  }

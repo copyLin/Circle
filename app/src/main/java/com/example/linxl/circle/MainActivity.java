@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.ChatItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.BottomNavigationViewHelper;
 import com.example.linxl.circle.utils.SPUtil;
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -190,8 +192,21 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
+
+        checkMessageState();
     }
 
+    private void checkMessageState(){
+        int count = DataSupport.where("toId = ? and flag = ?", userId, "0").count(ChatItem.class);
+        if (count == 0) {
+            mFloatingActionButton.setImageResource(R.drawable.ic_chat);
+        } else {
+            mFloatingActionButton.setImageResource(R.drawable.ic_chat_new);
+        }
+        Log.d("———— MainActivity ————", "messageState:" + count);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
@@ -226,21 +241,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart(){
         super.onRestart();
-        Log.d("————MainActivity————", "activity restart");
-        int count = DataSupport.where("toId = ? and flag = ?", userId, "0").count(ChatItem.class);
-        if (count == 0) {
-            mFloatingActionButton.setImageResource(R.drawable.ic_chat);
-        } else {
-            mFloatingActionButton.setImageResource(R.drawable.ic_chat_new);
-        }
+        checkMessageState();
 
+        Log.d("————MainActivity————", "activity restart");
     }
 
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        Log.d("———— MainActivity ————", "activity destroy");
         stopService(serviceIntent);
+        ActivityCollector.removeAvtivity(this);
+
+        Log.d("———— MainActivity ————", "activity destroy");
     }
 
 

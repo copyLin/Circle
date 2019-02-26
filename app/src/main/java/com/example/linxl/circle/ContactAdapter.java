@@ -3,6 +3,7 @@ package com.example.linxl.circle;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,7 +80,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         holder.recentMsg.setText(item.getRecentChat());
         Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + item.getContactImg()).into(holder.mCircleImageView);
 
-        int count = DataSupport.where("fromId = ? and flag = ?", item.getContactId(), "0").count(ChatItem.class);
+        String fromId = item.getContactId();
+        int count = DataSupport.where("fromId = ? and flag = ?", fromId, "0").count(ChatItem.class);
         if (count == 0){
             holder.msgCount.setVisibility(View.INVISIBLE);
         } else if (count >99) {
@@ -89,6 +91,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             holder.msgCount.setText("" + count);
             holder.msgCount.setVisibility(View.VISIBLE);
         }
+
+        Log.d("———ContactAdapter———", "count:" + count);
     }
 
     @Override

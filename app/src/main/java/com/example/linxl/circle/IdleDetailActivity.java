@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.IdleItem;
 import com.example.linxl.circle.gson.ViewPointItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 import com.example.linxl.circle.utils.TimeCapture;
@@ -61,10 +63,13 @@ public class IdleDetailActivity extends AppCompatActivity {
     private boolean collectionState = false;
     private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
     private String userId;
+    private String keyId;
+    private String label;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_idle_detail);
         mCircleImageView = (CircleImageView) findViewById(R.id.user_image);
         userName = (TextView) findViewById(R.id.user_name);
@@ -88,8 +93,8 @@ public class IdleDetailActivity extends AppCompatActivity {
         }
 
         Intent intent = getIntent();
-        String keyId = intent.getStringExtra("keyId");
-        String label = intent.getStringExtra("label");
+        keyId = intent.getStringExtra("keyId");
+        label = intent.getStringExtra("label");
         userId = intent.getStringExtra("userId");
 
         getItemDetail(keyId, label);
@@ -133,7 +138,8 @@ public class IdleDetailActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(IdleDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(IdleDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
+                                            getItemViewPoint(keyId, label);
                                         }
                                     });
                                 }
@@ -262,7 +268,7 @@ public class IdleDetailActivity extends AppCompatActivity {
                 dialog4.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        addCollection(name.getText().toString(), mIdleItem.getUserId(), mIdleItem.getIdleId());
+                        addCollection(name.getText().toString(), myId, mIdleItem.getIdleId());
                     }
                 });
                 dialog4.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -562,5 +568,11 @@ public class IdleDetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

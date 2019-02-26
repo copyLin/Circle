@@ -1,6 +1,9 @@
 package com.example.linxl.circle;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,8 +16,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.linxl.circle.gson.ChatItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
+
+import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 
@@ -31,6 +39,7 @@ public class SettingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_setting);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -102,7 +111,28 @@ public class SettingActivity extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog.Builder dialog3 = new AlertDialog.Builder(SettingActivity.this);
+                dialog3.setMessage("点击确定，突出当前用户");
+                dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SPUtil.removeParam(MyApplication.getContext(), SPUtil.USER_ID);
+                        SPUtil.removeParam(MyApplication.getContext(), SPUtil.USER_NAME);
+                        SPUtil.removeParam(MyApplication.getContext(), SPUtil.USER_IMG);
+                        SPUtil.removeParam(MyApplication.getContext(), SPUtil.IS_LOGIN);
+                        DataSupport.deleteAll(ChatItem.class);
+                        ActivityCollector.finishAll();
 
+                        startActivity(new Intent(SettingActivity.this, LoginActivity.class));
+                    }
+                });
+                dialog3.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog3.show();
             }
         });
     }
@@ -117,5 +147,11 @@ public class SettingActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

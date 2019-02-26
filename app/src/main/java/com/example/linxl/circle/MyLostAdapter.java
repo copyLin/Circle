@@ -60,6 +60,7 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             switch (message.what) {
                 case CONTROL_SUCCESS:
                     Toast.makeText(MyApplication.getContext(), "操作成功", Toast.LENGTH_SHORT).show();
+                    notifyDataSetChanged();
                     break;
                 case CONTROL_FAIL:
                     Toast.makeText(MyApplication.getContext(), "操作失败", Toast.LENGTH_SHORT).show();
@@ -136,7 +137,7 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            deleteMyLost(lostItem.getUserId(), lostItem.getSendTime());
+                                            deleteMyLost(lostItem);
                                         }
                                     });
                                     dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -153,7 +154,7 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     dialog2.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            hideMyLost(lostItem.getUserId(), lostItem.getSendTime());
+                                            hideMyLost(lostItem);
                                         }
                                     });
                                     dialog2.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -170,7 +171,7 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            openMyLost(lostItem.getUserId(), lostItem.getSendTime());
+                                            openMyLost(lostItem);
                                         }
                                     });
                                     dialog3.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -181,9 +182,8 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     });
                                     dialog3.show();
                                     break;
-                                case R.id.report:
-                                    break;
                                 default:
+                                    break;
 
                             }
                             return true;
@@ -197,6 +197,7 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     });
 
                     popupMenu.getMenu().findItem(R.id.like).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.report).setVisible(false);
                     if (lostItem.isFlag()){
                         popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
                         popupMenu.getMenu().findItem(R.id.open).setVisible(true);
@@ -282,11 +283,11 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
-    private void deleteMyLost(String userId, String sendTime) {
+    private void deleteMyLost(final LostItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "deleteLostServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -299,21 +300,21 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
+
+                    mLostItems.remove(item);
                 }
             }
         });
     }
 
-    private void hideMyLost(String userId, String sendTime) {
+    private void hideMyLost(final LostItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateLostFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -327,21 +328,21 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
+
+                    item.setFlag(true);
                 }
             }
         });
     }
 
-    private void openMyLost(String userId, String sendTime) {
+    private void openMyLost(final LostItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateLostFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -355,42 +356,11 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
-                }
-            }
-        });
-    }
 
-    private void addCollection(String name, String userId, String keyId) {
-        String sendTime = TimeCapture.getChinaTime();
-        String address = mContext.getResources().getString(R.string.server_ip) + "newCollectionServlet";
-        RequestBody requestBody = new FormBody.Builder()
-                .add("name", name)
-                .add("userId", userId)
-                .add("collectionTime", sendTime)
-                .add("keyId", keyId)
-                .add("label", "Lost")
-                .build();
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message message = new Message();
-                message.what = CONTROL_FAIL;
-                mHandler.sendMessage(message);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
-                    Message message = new Message();
-                    message.what = CONTROL_SUCCESS;
-                    mHandler.sendMessage(message);
+                    item.setFlag(false);
                 }
             }
         });

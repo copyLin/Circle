@@ -1,6 +1,5 @@
 package com.example.linxl.circle;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,21 +7,19 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.DeliveryItem;
 import com.example.linxl.circle.gson.IdleItem;
 import com.example.linxl.circle.gson.LostItem;
 import com.example.linxl.circle.gson.QuestionItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -47,6 +44,7 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_search);
         mSpinner = (Spinner) findViewById(R.id.spinner);
         mEditText = (EditText) findViewById(R.id.search_text);
@@ -59,6 +57,7 @@ public class SearchActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
 
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -183,5 +182,11 @@ public class SearchActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

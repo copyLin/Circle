@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.ImageLoader;
 import com.example.linxl.circle.utils.SPUtil;
@@ -54,6 +55,7 @@ public class NewQuestionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_new_question);
         ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -213,5 +215,11 @@ public class NewQuestionActivity extends AppCompatActivity {
             addImgButton.setEnabled(false);
         }
         mRecyclerView.setAdapter(mImageAdapter);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.ImageLoader;
 import com.example.linxl.circle.utils.SPUtil;
@@ -67,6 +68,7 @@ public class NewLostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_new_lost);
         ScrollView scrollView = (ScrollView) findViewById(R.id.scroll_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -267,5 +269,11 @@ public class NewLostActivity extends AppCompatActivity {
             addImgButton.setEnabled(false);
         }
         mRecyclerView.setAdapter(mImageAdapter);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
     }
 }

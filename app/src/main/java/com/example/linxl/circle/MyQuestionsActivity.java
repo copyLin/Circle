@@ -1,5 +1,6 @@
 package com.example.linxl.circle;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.QuestionItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
@@ -28,6 +30,7 @@ import okhttp3.Response;
 
 public class MyQuestionsActivity extends AppCompatActivity {
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
 
     private List<QuestionItem> items;
@@ -41,7 +44,9 @@ public class MyQuestionsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_my_questions);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -117,8 +122,6 @@ public class MyQuestionsActivity extends AppCompatActivity {
                         currentId = item.getQuestionId();
                         allItems.addAll(items);
 
-                        Log.d("————MyQuestion————", "items: " + allItems);
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -145,4 +148,15 @@ public class MyQuestionsActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d("—————MyQuestion—————", "onResume");
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
+    }
 }

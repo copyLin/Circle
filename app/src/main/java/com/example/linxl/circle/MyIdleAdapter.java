@@ -60,6 +60,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             switch (message.what) {
                 case CONTROL_SUCCESS:
                     Toast.makeText(MyApplication.getContext(), "操作成功", Toast.LENGTH_SHORT).show();
+                    notifyDataSetChanged();
                     break;
                 case CONTROL_FAIL:
                     Toast.makeText(MyApplication.getContext(), "操作失败", Toast.LENGTH_SHORT).show();
@@ -134,7 +135,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            deleteMyIdle(idleItem.getUserId(), idleItem.getSendTime());
+                                            deleteMyIdle(idleItem);
                                         }
                                     });
                                     dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -151,7 +152,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     dialog2.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            hideMyIdle(idleItem.getUserId(), idleItem.getSendTime());
+                                            hideMyIdle(idleItem);
                                         }
                                     });
                                     dialog2.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -168,7 +169,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            openMyIdle(idleItem.getUserId(), idleItem.getSendTime());
+                                            openMyIdle(idleItem);
                                         }
                                     });
                                     dialog3.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -179,9 +180,8 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                     });
                                     dialog3.show();
                                     break;
-                                case R.id.report:
-                                    break;
                                 default:
+                                    break;
 
                             }
                             return true;
@@ -195,6 +195,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     });
 
                     popupMenu.getMenu().findItem(R.id.like).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.report).setVisible(false);
                     if (idleItem.isFlag()){
                         popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
                         popupMenu.getMenu().findItem(R.id.open).setVisible(true);
@@ -279,11 +280,11 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
-    private void deleteMyIdle(String userId, String sendTime) {
+    private void deleteMyIdle(final IdleItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "deleteIdleServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -296,21 +297,21 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
+
+                    mIdleItems.remove(item);
                 }
             }
         });
     }
 
-    private void hideMyIdle(String userId, String sendTime) {
+    private void hideMyIdle(final IdleItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateIdleFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -324,21 +325,21 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
+
+                    item.setFlag(true);
                 }
             }
         });
     }
 
-    private void openMyIdle(String userId, String sendTime) {
+    private void openMyIdle(final IdleItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateIdleFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("userId", item.getUserId())
+                .add("sendTime", item.getSendTime())
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -352,42 +353,11 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
                     Message message = new Message();
                     message.what = CONTROL_SUCCESS;
                     mHandler.sendMessage(message);
-                }
-            }
-        });
-    }
 
-    private void addCollection(String name, String userId, String keyId) {
-        String sendTime = TimeCapture.getChinaTime();
-        String address = mContext.getResources().getString(R.string.server_ip) + "newCollectionServlet";
-        RequestBody requestBody = new FormBody.Builder()
-                .add("name", name)
-                .add("userId", userId)
-                .add("collectionTime", sendTime)
-                .add("keyId", keyId)
-                .add("label", "Idle")
-                .build();
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Message message = new Message();
-                message.what = CONTROL_FAIL;
-                mHandler.sendMessage(message);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()){
-                    String responseData = response.body().string();
-
-                    Message message = new Message();
-                    message.what = CONTROL_SUCCESS;
-                    mHandler.sendMessage(message);
+                    item.setFlag(false);
                 }
             }
         });

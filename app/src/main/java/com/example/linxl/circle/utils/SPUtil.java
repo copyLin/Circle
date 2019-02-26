@@ -17,10 +17,6 @@ public class SPUtil {
 
     public static final String USER_IMG = "userImg";
 
-    public static final String USER_DEPARTMENT = "userDepartment";
-
-    public static final String USER_MAJOR = "userMajor";
-
     public static final String IS_LOGIN = "isLogin";
 
 

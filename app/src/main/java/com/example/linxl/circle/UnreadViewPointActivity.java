@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.ViewPointItem;
+import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
@@ -34,6 +35,7 @@ public class UnreadViewPointActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_unread_viewpoint);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -91,4 +93,9 @@ public class UnreadViewPointActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        ActivityCollector.removeAvtivity(this);
+    }
 }
