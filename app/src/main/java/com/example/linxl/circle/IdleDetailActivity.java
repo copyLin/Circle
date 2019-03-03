@@ -11,9 +11,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -50,10 +52,12 @@ public class IdleDetailActivity extends AppCompatActivity {
     private TextView idlePrice;
     private ImageButton commentButton;
     private ImageButton connectButton;
+    private ImageButton sendButton;
+    private EditText inputText;
     private RecyclerView images;
     private RecyclerView viewPoint;
 
-    private ImageAdapter mImageAdapter;
+    private ImageHorizontalViewAdapter mImageAdapter;
     private ViewPointAdapter mViewPointAdapter;
 
     private IdleItem mIdleItem;
@@ -79,6 +83,8 @@ public class IdleDetailActivity extends AppCompatActivity {
         idlePrice = (TextView) findViewById(R.id.idle_price);
         commentButton = (ImageButton) findViewById(R.id.button_comment);
         connectButton = (ImageButton) findViewById(R.id.button_connect);
+        sendButton = (ImageButton) findViewById(R.id.send);
+        inputText = (EditText) findViewById(R.id.input_text);
         images = (RecyclerView) findViewById(R.id.idle_images);
         viewPoint = (RecyclerView) findViewById(R.id.view_point);
         imgPaths = new ArrayList<>();
@@ -104,50 +110,7 @@ public class IdleDetailActivity extends AppCompatActivity {
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText content = new EditText(IdleDetailActivity.this);
-                final AlertDialog.Builder builder = new AlertDialog.Builder(IdleDetailActivity.this);
-                builder.setTitle("评论");
-                builder.setView(content);
-                builder.setPositiveButton("发表", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String address = getString(R.string.server_ip) + "newViewPointServlet";
-                        RequestBody requestBody = new FormBody.Builder()
-                                .add("keyId", mIdleItem.getIdleId())
-                                .add("label", "Idle")
-                                .add("toId", mIdleItem.getUserId())
-                                .add("content", content.getText().toString())
-                                .add("userId", (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, ""))
-                                .add("sendTime", TimeCapture.getChinaTime())
-                                .build();
-                        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(IdleDetailActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-                                if (response.isSuccessful()){
-                                    final String responseData = response.body().string();
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(IdleDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
-                                            getItemViewPoint(keyId, label);
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });
-                builder.show();
+                showKeyboard(inputText);
             }
         });
 
@@ -159,7 +122,50 @@ public class IdleDetailActivity extends AppCompatActivity {
                 intent.putExtra("toId", mIdleItem.getUserId());
                 intent.putExtra("contactName", mIdleItem.getUserName());
                 intent.putExtra("contactImg", mIdleItem.getUserImg());
+                intent.putExtra("contactName", mIdleItem.getUserName());
                 startActivity(intent);
+            }
+        });
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String address = getString(R.string.server_ip) + "newViewPointServlet";
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("keyId", mIdleItem.getIdleId())
+                        .add("label", "Idle")
+                        .add("toId", mIdleItem.getUserId())
+                        .add("content", inputText.getText().toString())
+                        .add("userId", (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, ""))
+                        .add("sendTime", TimeCapture.getChinaTime())
+                        .build();
+                HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(IdleDetailActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.isSuccessful()){
+                            final String responseData = response.body().string();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    inputText.setText("");
+                                    hideKeyboard();
+                                    Toast.makeText(IdleDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
+                                    getItemViewPoint(keyId, label);
+                                }
+                            });
+                        }
+                    }
+                });
             }
         });
 
@@ -261,10 +267,10 @@ public class IdleDetailActivity extends AppCompatActivity {
                 dialog3.show();
                 break;
             case R.id.like:
-                final EditText name = new EditText(this);
+                View view = LayoutInflater.from(IdleDetailActivity.this).inflate(R.layout.dialog_new_collection, null);
+                final EditText name = view.findViewById(R.id.collection_name);
                 AlertDialog.Builder dialog4 = new android.support.v7.app.AlertDialog.Builder(this);
-                dialog4.setTitle("添加到收藏夹");
-                dialog4.setView(name);
+                dialog4.setView(view);
                 dialog4.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -315,7 +321,7 @@ public class IdleDetailActivity extends AppCompatActivity {
                             sendTime.setText(mIdleItem.getSendTime());
                             idleName.setText(mIdleItem.getIdleName());
                             content.setText(mIdleItem.getContent());
-                            idlePrice.setText(mIdleItem.getPrice());
+                            idlePrice.setText("¥ " + mIdleItem.getPrice());
                             Glide.with(IdleDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mIdleItem.getUserImg()).into(mCircleImageView);
 
                             if (!mIdleItem.getIdleImgs().isEmpty()) {
@@ -332,9 +338,10 @@ public class IdleDetailActivity extends AppCompatActivity {
                                 connectButton.setEnabled(true);
                             }
 
-                            GridLayoutManager gridLayoutManager = new GridLayoutManager(IdleDetailActivity.this, 3);
-                            mImageAdapter = new ImageAdapter(imgPaths);
-                            images.setLayoutManager(gridLayoutManager);
+                            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(IdleDetailActivity.this);
+                            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                            mImageAdapter = new ImageHorizontalViewAdapter(imgPaths);
+                            images.setLayoutManager(linearLayoutManager);
                             images.setAdapter(mImageAdapter);
 
                             invalidateOptionsMenu();
@@ -568,6 +575,20 @@ public class IdleDetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void showKeyboard(EditText editText){
+        editText.requestFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    private void hideKeyboard(){
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        View view = getWindow().peekDecorView();
+        if (null != view){
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @Override

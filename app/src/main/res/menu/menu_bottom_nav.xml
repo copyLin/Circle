@@ -5,19 +5,19 @@
         <item
             android:id="@+id/nav_question"
             android:icon="@drawable/ic_question"
-            android:title=""/>
+            android:title="话题"/>
         <item
             android:id="@+id/nav_lost"
             android:icon="@drawable/ic_lost"
-            android:title=""/>
+            android:title="寻物"/>
         <item
             android:id="@+id/nav_idle"
             android:icon="@drawable/ic_idle"
-            android:title=""/>
+            android:title="闲置"/>
         <item
             android:id="@+id/nav_delivery"
             android:icon="@drawable/ic_delivery"
-            android:title=""/>
+            android:title="跑腿"/>
     </group>
 
 </menu>

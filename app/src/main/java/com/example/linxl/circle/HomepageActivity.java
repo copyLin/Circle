@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,7 +81,7 @@ public class HomepageActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (getButtonState() == EDIT_BUTTON){
-                    editInfo.setImageResource(R.drawable.ic_send);
+                    editInfo.setImageResource(R.drawable.ic_done_theme);
                     setButtonState(DONE_BUTTON);
                     updateEditTextState();
 
@@ -109,7 +110,7 @@ public class HomepageActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    editInfo.setImageResource(R.drawable.ic_edit);
+                                    editInfo.setImageResource(R.drawable.ic_update);
                                     setButtonState(EDIT_BUTTON);
                                     updateEditTextState();
                                 }

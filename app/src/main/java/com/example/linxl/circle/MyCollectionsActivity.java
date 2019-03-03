@@ -54,6 +54,7 @@ public class MyCollectionsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setTitle("收藏夹");
         }
 
         allItems = new ArrayList<>();

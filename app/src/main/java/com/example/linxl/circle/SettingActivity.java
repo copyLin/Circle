@@ -48,6 +48,7 @@ public class SettingActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setTitle("设置");
         }
 
         LinearLayout changerPassword = (LinearLayout) findViewById(R.id.change_password);

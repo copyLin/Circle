@@ -9,22 +9,18 @@
         app:showAsAction="always"/>
     <item
         android:id="@+id/new_question"
-        android:icon="@drawable/ic_edit"
         android:title="@string/menu_question"
         app:showAsAction="never"/>
     <item
         android:id="@+id/new_lost"
-        android:icon="@drawable/ic_edit"
         android:title="@string/menu_lost"
         app:showAsAction="never"/>
     <item
         android:id="@+id/new_idle"
-        android:icon="@drawable/ic_edit"
         android:title="@string/menu_idle"
         app:showAsAction="never"/>
     <item
         android:id="@+id/new_delivery"
-        android:icon="@drawable/ic_edit"
         android:title="@string/menu_delivery"
         app:showAsAction="never"/>
 

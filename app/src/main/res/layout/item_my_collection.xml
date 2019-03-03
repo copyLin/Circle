@@ -8,20 +8,20 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp">
+        android:layout_height="wrap_content">
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <ImageView
             android:id="@+id/collection_label"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/user_icon" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/label_unknow" />
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:layout_margin="8dp"
             android:gravity="center">
 
             <TextView
@@ -32,7 +32,7 @@
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="4dp" />
+                android:layout_height="8dp" />
 
             <TextView
                 android:id="@+id/collection_time"

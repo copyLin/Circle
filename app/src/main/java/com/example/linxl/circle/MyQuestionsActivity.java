@@ -54,6 +54,7 @@ public class MyQuestionsActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setTitle("我的话题");
         }
 
         allItems = new ArrayList<>();

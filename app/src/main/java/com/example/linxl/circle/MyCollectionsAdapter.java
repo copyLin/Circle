@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -71,14 +72,14 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
     class NormalViewHolder extends RecyclerView.ViewHolder{
 
         CardView mCardView;
-        CircleImageView mCircleImageView;
+        ImageView mImageView;
         TextView collectionName;
         TextView collectionTime;
 
         public NormalViewHolder(View view){
             super(view);
             mCardView = (CardView) view;
-            mCircleImageView = (CircleImageView) view.findViewById(R.id.collection_label);
+            mImageView = (ImageView) view.findViewById(R.id.collection_label);
             collectionName = (TextView) view.findViewById(R.id.collection_name);
             collectionTime = (TextView) view.findViewById(R.id.collection_time);
         }
@@ -202,8 +203,14 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
             CollectionItem collectionItem = mCollectionItems.get(position);
             ((NormalViewHolder) holder).collectionName.setText(collectionItem.getCollectionName());
             ((NormalViewHolder) holder).collectionTime.setText(collectionItem.getCollectionTime());
+            if (collectionItem.getLabel().equals("Question")){
+                ((NormalViewHolder) holder).mImageView.setImageResource(R.drawable.label_question);
+            }else if (collectionItem.getLabel().equals("Lost")){
+                ((NormalViewHolder) holder).mImageView.setImageResource(R.drawable.label_lost);
+            }else if (collectionItem.getLabel().equals("Idle")){
+                ((NormalViewHolder) holder).mImageView.setImageResource(R.drawable.label_idle);
+            }
 
-            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/label/" + collectionItem.getLabel() + ".jpg").into(((NormalViewHolder) holder).mCircleImageView);
 
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {

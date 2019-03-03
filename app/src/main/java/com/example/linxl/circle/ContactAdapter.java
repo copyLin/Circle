@@ -67,6 +67,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
                 intent.putExtra("toId", item.getContactId());
                 intent.putExtra("contactImg", item.getContactImg());
+                intent.putExtra("contactName", item.getContactName());
                 mContext.startActivity(intent);
             }
         });

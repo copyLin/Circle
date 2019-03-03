@@ -51,6 +51,7 @@ public class MyIdleActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setTitle("我的闲置");
         }
 
         allItems = new ArrayList<>();

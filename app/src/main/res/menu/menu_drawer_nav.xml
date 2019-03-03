@@ -8,28 +8,28 @@
             android:title="@string/my_homepage"/>
         <item
             android:id="@+id/my_questions"
-            android:icon="@drawable/ic_like"
+            android:icon="@drawable/ic_my_question"
             android:title="@string/my_questions"/>
         <item
             android:id="@+id/my_lost"
-            android:icon="@drawable/ic_info"
+            android:icon="@drawable/ic_my_lost"
             android:title="@string/my_lost"/>
         <item
             android:id="@+id/my_idle"
-            android:icon="@drawable/ic_setup"
+            android:icon="@drawable/ic_my_idle"
             android:title="@string/my_idle"/>
         <item
             android:id="@+id/my_delivery"
-            android:icon="@drawable/ic_setup"
+            android:icon="@drawable/ic_my_delivery"
             android:title="@string/my_delivery"/>
         <item
-            android:id="@+id/my_collections"
-            android:icon="@drawable/ic_setup"
-            android:title="@string/my_collections"/>
-        <item
             android:id="@+id/my_comments"
-            android:icon="@drawable/ic_setup"
+            android:icon="@drawable/ic_viewpoint"
             android:title="@string/my_comments"/>
+        <item
+            android:id="@+id/my_collections"
+            android:icon="@drawable/ic_like"
+            android:title="@string/my_collections"/>
     </group>
 
 </menu>

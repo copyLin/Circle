@@ -58,7 +58,7 @@ import okhttp3.Response;
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back_white);
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
@@ -74,9 +74,9 @@ import okhttp3.Response;
      @Override
      public boolean onPrepareOptionsMenu(Menu menu){
          if (doneMenuState){
-             menu.findItem(R.id.done).setVisible(true);
+             menu.findItem(R.id.done).setVisible(true).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
          }else {
-             menu.findItem(R.id.done).setVisible(false);
+             menu.findItem(R.id.done).setVisible(false).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
          }
          return true;
      }

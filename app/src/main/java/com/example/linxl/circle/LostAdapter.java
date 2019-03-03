@@ -118,6 +118,7 @@ public class LostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                     intent.putExtra("fromId", (String) SPUtil.getParam(mContext, SPUtil.USER_ID, ""));
                     intent.putExtra("toId", item.getUserId());
                     intent.putExtra("contactImg", item.getUserImg());
+                    intent.putExtra("contactName", item.getUserName());
                     mContext.startActivity(intent);
                 }
             });

@@ -15,14 +15,17 @@
     <string name="lost_location">地点：</string>
     <string name="lost_contact">联系方式：</string>
     <string name="lost_detail">更多信息：</string>
+    <string name="delivery_content">跑腿任务</string>
     <string name="data_hint">选择日期</string>
     <string name="time_hint">选择时间</string>
+    <string name="hint_viewpoint">发表你的评论...</string>
+    <string name="hint_question">发表你的校园话题...</string>
     <string name="my_homepage">个人主页</string>
-    <string name="my_questions">我的问题</string>
+    <string name="my_questions">我的话题</string>
     <string name="my_lost">我的寻物</string>
     <string name="my_idle">我的闲置</string>
     <string name="my_delivery">我的跑腿</string>
-    <string name="my_collections">我的收藏</string>
+    <string name="my_collections">收藏夹</string>
     <string name="my_comments">我的评论</string>
     <string name="login_id">账号</string>
     <string name="login_password">密码</string>
@@ -34,10 +37,10 @@
     <string name="user_words">留言：</string>
     <string name="footer_state_0">正在加载</string>
     <string name="footer_state_1">—— 我是有底线的 ——</string>
-    <string name="menu_question">问答</string>
-    <string name="menu_lost">失物</string>
-    <string name="menu_idle">闲置</string>
-    <string name="menu_delivery">跑腿</string>
+    <string name="menu_question">校园话题</string>
+    <string name="menu_lost">寻物启事</string>
+    <string name="menu_idle">闲置物品</string>
+    <string name="menu_delivery">校园跑腿</string>
     <string name="menu_open">设为公开</string>
     <string name="menu_delete">删除</string>
     <string name="menu_hide">仅自己可见</string>
@@ -51,6 +54,7 @@
     <string name="old_password">原始密码：</string>
     <string name="new_password">新密码：</string>
     <string name="confirm_password">确认密码：</string>
+    <string name="title_new_collection">添加到收藏夹</string>
 
     <string-array name="label_spinner">
         <item>校园话题</item>

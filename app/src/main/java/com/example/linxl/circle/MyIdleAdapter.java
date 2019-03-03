@@ -234,7 +234,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             IdleItem idleItem = mIdleItems.get(position);
             ((NormalViewHolder) holder).idleName.setText(idleItem.getIdleName());
             ((NormalViewHolder) holder).idleContent.setText(idleItem.getContent());
-            ((NormalViewHolder) holder).idlePrice.setText(idleItem.getPrice());
+            ((NormalViewHolder) holder).idlePrice.setText("¥ " + idleItem.getPrice());
             if (!idleItem.getIdleImgs().isEmpty()) {
                 Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/" + idleItem.getUserId() + "/" + idleItem.getIdleImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
             }

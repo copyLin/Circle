@@ -57,7 +57,7 @@ public class DeliveryFragment extends Fragment {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 
         allItems = new ArrayList<>();
-        layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         adapter = new DeliveryAdapter(allItems);
 
         mRecyclerView.setLayoutManager(layoutManager);

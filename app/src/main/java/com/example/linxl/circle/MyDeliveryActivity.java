@@ -51,10 +51,11 @@ public class MyDeliveryActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setTitle("我的跑腿");
         }
 
         allItems = new ArrayList<>();
-        layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         adapter = new MyDeliveryAdapter(allItems);
 
         mRecyclerView.setLayoutManager(layoutManager);

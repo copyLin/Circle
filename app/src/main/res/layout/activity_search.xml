@@ -46,24 +46,37 @@
         app:layout_anchor="@id/toolbar"
         app:layout_anchorGravity="bottom">
 
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/label_spinner"/>
+            android:padding="5dp"
+            android:background="@color/toolbarMain">
 
-        <EditText
-            android:id="@+id/search_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/label_spinner"/>
 
-        <ImageButton
-            android:id="@+id/button_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            android:background="@drawable/ic_search"/>
+            <EditText
+                android:id="@+id/search_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/edit_text_background"
+                android:maxLines="1" />
+
+            <ImageButton
+                android:id="@+id/button_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="6dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/ic_search_btn" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

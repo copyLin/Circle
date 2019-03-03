@@ -231,7 +231,7 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             DeliveryItem deliveryItem = mDeliveryItems.get(position);
             ((NormalViewHolder) holder).sendTime.setText(deliveryItem.getSendTime());
             ((NormalViewHolder) holder).deliveryContent.setText(deliveryItem.getContent());
-            ((NormalViewHolder) holder).price.setText(deliveryItem.getPrice());
+            ((NormalViewHolder) holder).price.setText("¥ " + deliveryItem.getPrice());
 
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {

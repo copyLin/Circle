@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -59,6 +60,8 @@ public class NewLostActivity extends AppCompatActivity {
     private EditText contact;
     private EditText content;
     private ImageButton addImgButton;
+    private View dateLayout;
+    private View timeLayout;
     private RecyclerView mRecyclerView;
     private List<String> imgPaths = new ArrayList<>();
     private ImageAdapter mImageAdapter;
@@ -79,10 +82,12 @@ public class NewLostActivity extends AppCompatActivity {
         contact = (EditText) findViewById(R.id.lost_contact);
         content = (EditText) findViewById(R.id.lost_content);
         addImgButton = (ImageButton) findViewById(R.id.add_image);
+        dateLayout = (View) findViewById(R.id.date_layout);
+        timeLayout = (View) findViewById(R.id.time_layout);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mImageLoader = new ImageLoader(this);
 
-        date.setOnClickListener(new View.OnClickListener() {
+        dateLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int y = calendar.get(Calendar.YEAR);
@@ -98,7 +103,7 @@ public class NewLostActivity extends AppCompatActivity {
             }
         });
 
-        time.setOnClickListener(new View.OnClickListener() {
+        timeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int h = calendar.get(Calendar.HOUR);

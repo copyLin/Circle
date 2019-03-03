@@ -58,6 +58,7 @@ public class ChatActivity extends AppCompatActivity {
     private String fromId;
     private String toId;
     private String contactImg;
+    private String contactName;
     private String currentId = "0";
     private int firstVisibleItem;
     private boolean hasMore = true;
@@ -89,6 +90,7 @@ public class ChatActivity extends AppCompatActivity {
         fromId = intent.getStringExtra("fromId");
         toId = intent.getStringExtra("toId");
         contactImg = intent.getStringExtra("contactImg");
+        contactName = intent.getStringExtra("contactName");
         mChatItems = new ArrayList<>();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -97,6 +99,7 @@ public class ChatActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setTitle(contactName);
         }
 
         DataSupport.deleteAll(ChatItem.class, "fromId = ? and flag = ?", toId, "0");
