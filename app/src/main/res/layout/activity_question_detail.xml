@@ -43,10 +43,10 @@
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/colorTheme"
-                    android:visibility="invisible"
-                    android:background="@color/toolbarMain"/>
+                    android:visibility="invisible" />
 
                 <LinearLayout
+                    android:id="@+id/item_detail_layout"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">

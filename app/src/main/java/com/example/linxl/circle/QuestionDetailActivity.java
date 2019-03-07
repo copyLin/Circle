@@ -59,6 +59,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private RecyclerView viewPoint;
     private TextView nullContent;
     private TextView nullViewPoint;
+    private View itemDetailLayout;
 
     private ImageHorizontalViewAdapter mImageAdapter;
     private ViewPointAdapter mViewPointAdapter;
@@ -68,6 +69,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private List<ViewPointItem> mViewPointItems;
 
     private boolean collectionState = false;
+    private boolean contentState = true;
     private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
     private String userId;
     private String keyId;
@@ -91,6 +93,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         viewPoint = (RecyclerView) findViewById(R.id.view_point);
         nullContent = (TextView) findViewById(R.id.hint_null_content);
         nullViewPoint = (TextView) findViewById(R.id.hint_null_viewpoint);
+        itemDetailLayout = (View) findViewById(R.id.item_detail_layout);
         imgPaths = new ArrayList<>();
         mViewPointItems = new ArrayList<>();
 
@@ -100,6 +103,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
 
         Intent intent = getIntent();
@@ -190,25 +194,34 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu){
-        if (myId.equals(userId)){
-            menu.findItem(R.id.delete).setVisible(true);
-            if (mQuestionItem != null && mQuestionItem.isFlag()){
-                menu.findItem(R.id.hide).setVisible(false);
-                menu.findItem(R.id.open).setVisible(true);
+        if (contentState){
+            if (myId.equals(userId)){
+                menu.findItem(R.id.delete).setVisible(true);
+                if (mQuestionItem != null && mQuestionItem.isFlag()){
+                    menu.findItem(R.id.hide).setVisible(false);
+                    menu.findItem(R.id.open).setVisible(true);
+                }else {
+                    menu.findItem(R.id.hide).setVisible(true);
+                    menu.findItem(R.id.open).setVisible(false);
+                }
             }else {
-                menu.findItem(R.id.hide).setVisible(true);
+                menu.findItem(R.id.delete).setVisible(false);
+                menu.findItem(R.id.hide).setVisible(false);
                 menu.findItem(R.id.open).setVisible(false);
+            }
+            if (collectionState){
+                menu.findItem(R.id.like).setTitle("已收藏").setEnabled(false);
+            }else {
+                menu.findItem(R.id.like).setTitle("收藏").setEnabled(true);
             }
         }else {
             menu.findItem(R.id.delete).setVisible(false);
             menu.findItem(R.id.hide).setVisible(false);
             menu.findItem(R.id.open).setVisible(false);
+            menu.findItem(R.id.like).setVisible(false);
+            menu.findItem(R.id.report).setVisible(false);
         }
-        if (collectionState){
-            menu.findItem(R.id.like).setTitle("已收藏").setEnabled(false);
-        }else {
-            menu.findItem(R.id.like).setTitle("收藏").setEnabled(true);
-        }
+
         return true;
     }
 
@@ -366,6 +379,9 @@ public class QuestionDetailActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 nullContent.setVisibility(View.VISIBLE);
+                                itemDetailLayout.setVisibility(View.INVISIBLE);
+                                contentState = false;
+                                invalidateOptionsMenu();
                             }
                         });
                     }else {
@@ -375,6 +391,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 nullContent.setVisibility(View.INVISIBLE);
+                                itemDetailLayout.setVisibility(View.VISIBLE);
                                 userName.setText(mQuestionItem.getUserName());
                                 sendTime.setText(mQuestionItem.getSendTime());
                                 content.setText(mQuestionItem.getContent());
@@ -437,6 +454,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 nullViewPoint.setVisibility(View.VISIBLE);
+
                             }
                         });
                     }else {

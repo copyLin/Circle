@@ -15,7 +15,7 @@
     <string name="lost_location">地点：</string>
     <string name="lost_contact">联系方式：</string>
     <string name="lost_detail">更多信息：</string>
-    <string name="delivery_content">跑腿任务</string>
+    <string name="delivery_content">跑腿任务：</string>
     <string name="data_hint">选择日期</string>
     <string name="time_hint">选择时间</string>
     <string name="hint_viewpoint">发表你的评论...</string>

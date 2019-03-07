@@ -143,7 +143,7 @@ public class UnreadViewPointAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                     break;
                 case NO_MORE:
                     ((FooterViewHolder)holder).mProgressBar.setVisibility(View.GONE);
-                    ((FooterViewHolder)holder).footerState.setText("—— 无未读评论 ——");
+                    ((FooterViewHolder)holder).footerState.setText("—— 无更多评论 ——");
                     break;
             }
         }

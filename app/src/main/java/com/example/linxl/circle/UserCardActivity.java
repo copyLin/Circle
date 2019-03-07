@@ -57,6 +57,7 @@ public class UserCardActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setDisplayShowTitleEnabled(false);
         }
 
         Intent intent = getIntent();

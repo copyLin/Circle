@@ -100,6 +100,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             @Override
             public void onClick(View v) {
                 holder.msgCount.setVisibility(View.INVISIBLE);
+                holder.badge.setVisibility(View.INVISIBLE);
                 int position = holder.getAdapterPosition();
                 ContactItem contactItem = mContactItems.get(position);
                 Intent intent = new Intent(view.getContext(), ChatActivity.class);
@@ -168,6 +169,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         String fromId = item.getContactId();
         int count = DataSupport.where("fromId = ? and flag = ?", fromId, "0").count(ChatItem.class);
         if (count == 0){
+            holder.msgCount.setVisibility(View.INVISIBLE);
             holder.badge.setVisibility(View.INVISIBLE);
         } else if (count >99) {
             holder.msgCount.setText("…");

@@ -24,14 +24,14 @@
             android:id="@+id/delivery_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_margin="2dp"
             android:textSize="14sp"/>
 
         <TextView
             android:id="@+id/delivery_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="4dp"
+            android:layout_margin="2dp"
             android:textSize="14sp"/>
 
         <LinearLayout
@@ -43,6 +43,7 @@
                 android:id="@+id/delivery_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="2dp"
                 android:textSize="24sp"
                 android:textColor="@color/colorTheme"
                 android:textStyle="bold"/>

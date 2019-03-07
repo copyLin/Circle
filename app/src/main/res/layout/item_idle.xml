@@ -39,6 +39,8 @@
                 android:id="@+id/idle_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textSize="14sp"/>
 
             <LinearLayout
@@ -53,7 +55,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="24sp"
-                    android:textColor="@color/colorTheme"/>
+                    android:textColor="@color/colorTheme"
+                    android:textStyle="bold"/>
 
                 <LinearLayout
                     android:orientation="horizontal"
