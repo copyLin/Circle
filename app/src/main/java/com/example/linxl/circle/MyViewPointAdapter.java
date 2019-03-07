@@ -147,7 +147,7 @@ public class MyViewPointAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     int position = holder.getAdapterPosition();
                     final ViewPointItem viewPointItem = mViewPointItems.get(position);
                     PopupMenu popupMenu = new PopupMenu(mContext,v);
-                    popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
+                    popupMenu.getMenuInflater().inflate(R.menu.menu_delete, popupMenu.getMenu());
                     popupMenu.show();
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
@@ -183,10 +183,6 @@ public class MyViewPointAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         }
                     });
 
-                    popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.open).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.like).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.report).setVisible(false);
                     return false;
                 }
             });

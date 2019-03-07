@@ -1,6 +1,7 @@
 package com.example.linxl.circle;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,11 +12,18 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.ViewPointItem;
+import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 
+import java.io.IOException;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created by Linxl on 2019/1/20.
@@ -75,12 +83,33 @@ public class UnreadViewPointAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (viewType == TYPE_NORMAL){
             final View view = LayoutInflater.from(mContext).inflate(R.layout.item_viewpoint_with_tip, parent, false);
             final NormalViewHolder holder = new NormalViewHolder(view);
-            int position = holder.getAdapterPosition();
-            final ViewPointItem item = mViewPointItems.get(position);
+
             holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    int position = holder.getAdapterPosition();
+                    ViewPointItem viewPointItem = mViewPointItems.get(position);
+                    Intent intent = null;
+                    switch (viewPointItem.getLabel()){
+                        case "Question":
+                            intent = new Intent(mContext, QuestionDetailActivity.class);
+                            intent.putExtra("keyId", viewPointItem.getKeyId());
+                            intent.putExtra("label", viewPointItem.getLabel());
+                            break;
+                        case "Lost":
+                            intent = new Intent(mContext, LostDetailActivity.class);
+                            intent.putExtra("keyId", viewPointItem.getKeyId());
+                            intent.putExtra("label", viewPointItem.getLabel());
+                            break;
+                        case "Idle":
+                            intent = new Intent(mContext, IdleDetailActivity.class);
+                            intent.putExtra("keyId", viewPointItem.getKeyId());
+                            intent.putExtra("label", viewPointItem.getLabel());
+                            break;
+                        default:
+                            break;
+                    }
+                    mContext.startActivity(intent);
                 }
             });
             return holder;
@@ -114,7 +143,7 @@ public class UnreadViewPointAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                     break;
                 case NO_MORE:
                     ((FooterViewHolder)holder).mProgressBar.setVisibility(View.GONE);
-                    ((FooterViewHolder)holder).footerState.setText("—— 我是有底线的 ——");
+                    ((FooterViewHolder)holder).footerState.setText("—— 无未读评论 ——");
                     break;
             }
         }
@@ -140,4 +169,5 @@ public class UnreadViewPointAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         this.footer_state = state;
         notifyDataSetChanged();
     }
+
 }

@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.DeliveryItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
@@ -232,6 +233,8 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             ((NormalViewHolder) holder).sendTime.setText(deliveryItem.getSendTime());
             ((NormalViewHolder) holder).deliveryContent.setText(deliveryItem.getContent());
             ((NormalViewHolder) holder).price.setText("¥ " + deliveryItem.getPrice());
+
+            Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/user_img/" + deliveryItem.getUserImg()).into(((NormalViewHolder) holder).mImageView);
 
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {

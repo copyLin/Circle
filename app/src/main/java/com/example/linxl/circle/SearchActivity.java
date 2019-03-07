@@ -7,12 +7,14 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.DeliveryItem;
@@ -40,6 +42,7 @@ public class SearchActivity extends AppCompatActivity {
     private ImageButton mImageButton;
     private RecyclerView mRecyclerView;
     private String selectedLab;
+    private TextView nullResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,7 @@ public class SearchActivity extends AppCompatActivity {
         mEditText = (EditText) findViewById(R.id.search_text);
         mImageButton = (ImageButton) findViewById(R.id.button_search);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        nullResult = (TextView) findViewById(R.id.hint_null_result);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -100,7 +104,7 @@ public class SearchActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(SearchActivity.this, "没有相关内容", Toast.LENGTH_SHORT).show();
+                                nullResult.setVisibility(View.VISIBLE);
                             }
                         });
                     }else {
@@ -111,26 +115,31 @@ public class SearchActivity extends AppCompatActivity {
                                         new TypeToken<List<QuestionItem>>(){}.getType());
                                 final LinearLayoutManager questionManager = new LinearLayoutManager(SearchActivity.this);
                                 final QuestionAdapter questionAdapter = new QuestionAdapter(questionItems);
-                                questionAdapter.changeState(1);
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        nullResult.setVisibility(View.INVISIBLE);
                                         mRecyclerView.setLayoutManager(questionManager);
                                         mRecyclerView.setAdapter(questionAdapter);
+                                        questionAdapter.changeState(1);
                                     }
                                 });
                                 break;
                             case "寻物启事":
                                 List<LostItem> lostItems = gson.fromJson(responseData,
                                         new TypeToken<List<LostItem>>(){}.getType());
+
                                 final GridLayoutManager lostManager = new GridLayoutManager(SearchActivity.this, 2);
                                 final LostAdapter lostAdapter = new LostAdapter(lostItems);
-                                lostAdapter.changeState(1);
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        nullResult.setVisibility(View.INVISIBLE);
                                         mRecyclerView.setLayoutManager(lostManager);
                                         mRecyclerView.setAdapter(lostAdapter);
+                                        lostAdapter.changeState(1);
                                     }
                                 });
                                 break;
@@ -139,26 +148,30 @@ public class SearchActivity extends AppCompatActivity {
                                         new TypeToken<List<IdleItem>>(){}.getType());
                                 final LinearLayoutManager idleManager = new LinearLayoutManager(SearchActivity.this);
                                 final IdleAdapter idleAdapter = new IdleAdapter(idleItems);
-                                idleAdapter.changeState(1);
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        nullResult.setVisibility(View.INVISIBLE);
                                         mRecyclerView.setLayoutManager(idleManager);
                                         mRecyclerView.setAdapter(idleAdapter);
+                                        idleAdapter.changeState(1);
                                     }
                                 });
                                 break;
                             case "校园跑腿":
                                 List<DeliveryItem> deliveryItems = gson.fromJson(responseData,
                                         new TypeToken<List<DeliveryItem>>(){}.getType());
-                                final GridLayoutManager deliveryManager = new GridLayoutManager(SearchActivity.this, 3);
+                                final GridLayoutManager deliveryManager = new GridLayoutManager(SearchActivity.this, 2);
                                 final DeliveryAdapter deliveryAdapter = new DeliveryAdapter(deliveryItems);
-                                deliveryAdapter.changeState(1);
+
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        nullResult.setVisibility(View.INVISIBLE);
                                         mRecyclerView.setLayoutManager(deliveryManager);
                                         mRecyclerView.setAdapter(deliveryAdapter);
+                                        deliveryAdapter.changeState(1);
                                     }
                                 });
                                 break;

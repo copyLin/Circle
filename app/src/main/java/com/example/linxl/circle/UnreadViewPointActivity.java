@@ -1,9 +1,12 @@
 package com.example.linxl.circle;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.ViewPointItem;
@@ -39,6 +42,15 @@ public class UnreadViewPointActivity extends AppCompatActivity {
         setContentView(R.layout.activity_unread_viewpoint);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
+            actionBar.setTitle("未读评论");
+        }
+
         allItems = new ArrayList<>();
         layoutManager = new LinearLayoutManager(this);
         adapter = new UnreadViewPointAdapter(allItems);
@@ -70,7 +82,7 @@ public class UnreadViewPointActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(UnreadViewPointActivity.this, "无未读消息", Toast.LENGTH_SHORT).show();
+                                adapter.changeState(1);
                             }
                         });
 
@@ -83,6 +95,7 @@ public class UnreadViewPointActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 adapter.notifyDataSetChanged();
+                                adapter.changeState(1);
 
                             }
                         });
@@ -91,6 +104,18 @@ public class UnreadViewPointActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     @Override

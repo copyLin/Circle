@@ -1,5 +1,6 @@
 package com.example.linxl.circle;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.ContactItem;
@@ -28,6 +30,8 @@ import okhttp3.Response;
 
 public class ContactsActivity extends AppCompatActivity {
 
+    private View unreadViewPoint;
+    private View nullContact;
     private RecyclerView mRecyclerView;
     private List<ContactItem> mContactItems;
 
@@ -37,6 +41,8 @@ public class ContactsActivity extends AppCompatActivity {
         ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_contacts);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        unreadViewPoint = (View) findViewById(R.id.unread_viewpoint);
+        nullContact = (View) findViewById(R.id.hint_null_contact);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -46,6 +52,13 @@ public class ContactsActivity extends AppCompatActivity {
         }
 
         requestForContact();
+
+        unreadViewPoint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ContactsActivity.this, UnreadViewPointActivity.class));
+            }
+        });
 
     }
 
@@ -70,7 +83,12 @@ public class ContactsActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     final String responseData = response.body().string();
                     if (responseData.equals("NoData")){
-                        Toast.makeText(ContactsActivity.this, "尚未有用户向您发送私信", Toast.LENGTH_SHORT).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                nullContact.setVisibility(View.VISIBLE);
+                            }
+                        });
                     }else {
                         Gson gson = new Gson();
                         mContactItems = gson.fromJson(responseData,
@@ -79,6 +97,7 @@ public class ContactsActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                nullContact.setVisibility(View.INVISIBLE);
                                 LinearLayoutManager layoutManager = new LinearLayoutManager(ContactsActivity.this);
                                 ContactAdapter adapter = new ContactAdapter(mContactItems);
                                 mRecyclerView.setLayoutManager(layoutManager);

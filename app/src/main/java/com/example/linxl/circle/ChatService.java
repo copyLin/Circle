@@ -34,7 +34,7 @@ import okhttp3.Response;
 
 public class ChatService extends Service {
 
-    private static final String HOST = "192.168.31.100";
+    private static final String HOST = "10.29.17.3";
     private static final int PORT = 8090;
 
     private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");

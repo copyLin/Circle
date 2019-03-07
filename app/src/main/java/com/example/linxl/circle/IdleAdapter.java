@@ -42,7 +42,6 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         TextView idleName;
         TextView idleContent;
         TextView idlePrice;
-        ImageButton commentButton;
         ImageButton connectButton;
 
         public NormalViewHolder(View view){
@@ -52,7 +51,6 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             idleName = (TextView) view.findViewById(R.id.idle_name);
             idleContent = (TextView) view.findViewById(R.id.idle_content);
             idlePrice = (TextView) view.findViewById(R.id.idle_price);
-            commentButton = (ImageButton) view.findViewById(R.id.button_comment);
             connectButton = (ImageButton) view.findViewById(R.id.button_connect);
         }
 
@@ -95,18 +93,7 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                     mContext.startActivity(intent);
                 }
             });
-            holder.commentButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = holder.getAdapterPosition();
-                    IdleItem item = mIdleItems.get(position);
-                    Intent intent = new Intent(mContext, IdleDetailActivity.class);
-                    intent.putExtra("keyId", item.getIdleId());
-                    intent.putExtra("label", "Idle");
-                    intent.putExtra("userId", item.getUserId());
-                    mContext.startActivity(intent);
-                }
-            });
+
             holder.connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

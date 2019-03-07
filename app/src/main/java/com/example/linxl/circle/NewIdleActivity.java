@@ -73,6 +73,7 @@ public class NewIdleActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_cancel);
+            actionBar.setTitle("发布闲置");
         }
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3);

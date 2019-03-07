@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,6 +57,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private EditText inputText;
     private RecyclerView images;
     private RecyclerView viewPoint;
+    private TextView nullContent;
+    private TextView nullViewPoint;
 
     private ImageHorizontalViewAdapter mImageAdapter;
     private ViewPointAdapter mViewPointAdapter;
@@ -68,6 +72,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private String userId;
     private String keyId;
     private String label;
+    private String reportReason = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +89,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
         inputText = (EditText) findViewById(R.id.input_text);
         images = (RecyclerView) findViewById(R.id.question_images);
         viewPoint = (RecyclerView) findViewById(R.id.view_point);
+        nullContent = (TextView) findViewById(R.id.hint_null_content);
+        nullViewPoint = (TextView) findViewById(R.id.hint_null_viewpoint);
         imgPaths = new ArrayList<>();
         mViewPointItems = new ArrayList<>();
 
@@ -282,6 +289,50 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 dialog4.show();
                 break;
             case R.id.report:
+
+                View reportView = LayoutInflater.from(QuestionDetailActivity.this).inflate(R.layout.dialog_report, null);
+                RadioGroup radioGroup = reportView.findViewById(R.id.radio_group);
+                final RadioButton item1 = reportView.findViewById(R.id.item_1);
+                final RadioButton item2 = reportView.findViewById(R.id.item_2);
+                final RadioButton item3 = reportView.findViewById(R.id.item_3);
+                final RadioButton item4 = reportView.findViewById(R.id.item_4);
+                final RadioButton item5 = reportView.findViewById(R.id.item_5);
+
+                radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+                        if (checkedId == item1.getId()){
+                            reportReason = getString(R.string.radio_item_1);
+                        }else if (checkedId == item2.getId()){
+                            reportReason = getString(R.string.radio_item_2);
+                        }else if (checkedId == item3.getId()){
+                            reportReason = getString(R.string.radio_item_3);
+                        }else if (checkedId == item4.getId()){
+                            reportReason = getString(R.string.radio_item_4);
+                        }else if (checkedId == item5.getId()){
+                            reportReason = getString(R.string.radio_item_5);
+                        }
+                    }
+                });
+
+                AlertDialog.Builder dialog5 = new android.support.v7.app.AlertDialog.Builder(this);
+                dialog5.setView(reportView);
+                dialog5.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Log.d("QuestionDetail", "reason" + reportReason);
+
+                        sendReport(mQuestionItem.getQuestionId(), reportReason, myId);
+                    }
+                });
+                dialog5.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog5.show();
                 break;
             default:
                 break;
@@ -310,40 +361,50 @@ public class QuestionDetailActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
-                    Gson gson = new Gson();
-                    mQuestionItem = gson.fromJson(responseData, QuestionItem.class);
+                    if (responseData.equals("NoData")){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                nullContent.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }else {
+                        Gson gson = new Gson();
+                        mQuestionItem = gson.fromJson(responseData, QuestionItem.class);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                nullContent.setVisibility(View.INVISIBLE);
+                                userName.setText(mQuestionItem.getUserName());
+                                sendTime.setText(mQuestionItem.getSendTime());
+                                content.setText(mQuestionItem.getContent());
+                                Glide.with(QuestionDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mQuestionItem.getUserImg()).into(mCircleImageView);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            userName.setText(mQuestionItem.getUserName());
-                            sendTime.setText(mQuestionItem.getSendTime());
-                            content.setText(mQuestionItem.getContent());
-                            Glide.with(QuestionDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mQuestionItem.getUserImg()).into(mCircleImageView);
-
-                            if (!mQuestionItem.getQuestionImgs().isEmpty()){
-                                for (String imgPath : mQuestionItem.getQuestionImgs()){
-                                    imgPaths.add(getString(R.string.server_ip) + "image/" + mQuestionItem.getUserId() + "/" + imgPath);
+                                if (!mQuestionItem.getQuestionImgs().isEmpty()){
+                                    for (String imgPath : mQuestionItem.getQuestionImgs()){
+                                        imgPaths.add(getString(R.string.server_ip) + "image/" + mQuestionItem.getUserId() + "/" + imgPath);
+                                    }
                                 }
+
+                                if (mQuestionItem.getUserId().equals(myId)){
+                                    connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
+                                    connectButton.setEnabled(false);
+                                }else {
+                                    connectButton.setBackgroundResource(R.drawable.ic_connect);
+                                    connectButton.setEnabled(true);
+                                }
+
+                                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(QuestionDetailActivity.this);
+                                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                                mImageAdapter = new ImageHorizontalViewAdapter(imgPaths);
+                                images.setLayoutManager(linearLayoutManager);
+                                images.setAdapter(mImageAdapter);
+
+                                invalidateOptionsMenu();
                             }
+                        });
+                    }
 
-                            if (mQuestionItem.getUserId().equals(myId)){
-                                connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
-                                connectButton.setEnabled(false);
-                            }else {
-                                connectButton.setBackgroundResource(R.drawable.ic_connect);
-                                connectButton.setEnabled(true);
-                            }
-
-                            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(QuestionDetailActivity.this);
-                            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                            mImageAdapter = new ImageHorizontalViewAdapter(imgPaths);
-                            images.setLayoutManager(linearLayoutManager);
-                            images.setAdapter(mImageAdapter);
-
-                            invalidateOptionsMenu();
-                        }
-                    });
                 }
             }
         });
@@ -375,7 +436,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(QuestionDetailActivity.this, "暂时没有评论", Toast.LENGTH_SHORT).show();
+                                nullViewPoint.setVisibility(View.VISIBLE);
                             }
                         });
                     }else {
@@ -387,6 +448,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                nullViewPoint.setVisibility(View.INVISIBLE);
                                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(QuestionDetailActivity.this);
                                 mViewPointAdapter = new ViewPointAdapter(mViewPointItems);
                                 viewPoint.setLayoutManager(linearLayoutManager);
@@ -434,8 +496,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             invalidateOptionsMenu();
-
-                            Log.d("————QuesDetail————", "" + collectionState);
                         }
                     });
 
@@ -573,6 +633,40 @@ public class QuestionDetailActivity extends AppCompatActivity {
                         public void run() {
                             collectionState = true;
                             invalidateOptionsMenu();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void sendReport(String keyId, String reason, String userId){
+        String address = getString(R.string.server_ip) + "newReportServlet";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("keyId", keyId)
+                .add("label", "Question")
+                .add("reason", reason)
+                .add("userId", userId)
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(QuestionDetailActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(QuestionDetailActivity.this, "后台已收到您的举报", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

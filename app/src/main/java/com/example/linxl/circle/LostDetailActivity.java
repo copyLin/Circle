@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +59,8 @@ public class LostDetailActivity extends AppCompatActivity {
     private EditText inputText;
     private RecyclerView images;
     private RecyclerView viewPoint;
+    private TextView nullContent;
+    private TextView nullViewPoint;
 
     private ImageHorizontalViewAdapter mImageAdapter;
     private ViewPointAdapter mViewPointAdapter;
@@ -70,6 +74,7 @@ public class LostDetailActivity extends AppCompatActivity {
     private String userId;
     private String keyId;
     private String label;
+    private String reportReason;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +94,8 @@ public class LostDetailActivity extends AppCompatActivity {
         inputText = (EditText) findViewById(R.id.input_text);
         images = (RecyclerView) findViewById(R.id.lost_images);
         viewPoint = (RecyclerView) findViewById(R.id.view_point);
+        nullContent = (TextView) findViewById(R.id.hint_null_content);
+        nullViewPoint = (TextView) findViewById(R.id.hint_null_viewpoint);
         imgPaths = new ArrayList<>();
         mViewPointItems = new ArrayList<>();
 
@@ -285,6 +292,51 @@ public class LostDetailActivity extends AppCompatActivity {
                 });
                 dialog4.show();
                 break;
+            case R.id.report:
+
+                View reportView = LayoutInflater.from(LostDetailActivity.this).inflate(R.layout.dialog_report, null);
+                final RadioGroup radioGroup = reportView.findViewById(R.id.radio_group);
+                final RadioButton item1 = reportView.findViewById(R.id.item_1);
+                final RadioButton item2 = reportView.findViewById(R.id.item_2);
+                final RadioButton item3 = reportView.findViewById(R.id.item_3);
+                final RadioButton item4 = reportView.findViewById(R.id.item_4);
+                final RadioButton item5 = reportView.findViewById(R.id.item_5);
+
+                radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, int checkedId) {
+                        if (checkedId == item1.getId()){
+                            reportReason = getString(R.string.radio_item_1);
+                        }else if (checkedId == item2.getId()){
+                            reportReason = getString(R.string.radio_item_2);
+                        }else if (checkedId == item3.getId()){
+                            reportReason = getString(R.string.radio_item_3);
+                        }else if (checkedId == item4.getId()){
+                            reportReason = getString(R.string.radio_item_4);
+                        }else if (checkedId == item5.getId()){
+                            reportReason = getString(R.string.radio_item_5);
+                        }
+                    }
+                });
+
+                AlertDialog.Builder dialog5 = new android.support.v7.app.AlertDialog.Builder(this);
+                dialog5.setView(reportView);
+                dialog5.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        sendReport(mLostItem.getLostId(), reportReason, myId);
+
+                    }
+                });
+                dialog5.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog5.show();
+                break;
             default:
                 break;
         }
@@ -312,41 +364,53 @@ public class LostDetailActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
                     String responseData = response.body().string();
-                    Gson gson = new Gson();
-                    mLostItem = gson.fromJson(responseData, LostItem.class);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            userName.setText(mLostItem.getUserName());
-                            sendTime.setText(mLostItem.getSendTime());
-                            content.setText(mLostItem.getContent());
-                            lostTime.setText(mLostItem.getEventTime());
-                            lostContact.setText(mLostItem.getContact());
-                            Glide.with(LostDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mLostItem.getUserImg()).into(mCircleImageView);
+                    if (responseData.equals("NoData")){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                nullContent.setVisibility(View.VISIBLE);
+                            }
+                        });
+                    }else {
+                        Gson gson = new Gson();
+                        nullContent.setVisibility(View.INVISIBLE);
+                        mLostItem = gson.fromJson(responseData, LostItem.class);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                userName.setText(mLostItem.getUserName());
+                                sendTime.setText(mLostItem.getSendTime());
+                                content.setText(mLostItem.getContent());
+                                lostTime.setText(mLostItem.getEventTime());
+                                lostLocation.setText(mLostItem.getLocation());
+                                lostContact.setText(mLostItem.getContact());
+                                Glide.with(LostDetailActivity.this).load(getString(R.string.server_ip) + "image/user_img/" + mLostItem.getUserImg()).into(mCircleImageView);
 
-                            if (!mLostItem.getLostImgs().isEmpty()) {
-                                for (String imgPath : mLostItem.getLostImgs()) {
-                                    imgPaths.add(getString(R.string.server_ip) + "image/" + mLostItem.getUserId() + "/" + imgPath);
+                                if (!mLostItem.getLostImgs().isEmpty()) {
+                                    for (String imgPath : mLostItem.getLostImgs()) {
+                                        imgPaths.add(getString(R.string.server_ip) + "image/" + mLostItem.getUserId() + "/" + imgPath);
+                                    }
                                 }
+
+                                if (mLostItem.getUserId().equals(myId)){
+                                    connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
+                                    connectButton.setEnabled(false);
+                                }else {
+                                    connectButton.setBackgroundResource(R.drawable.ic_connect);
+                                    connectButton.setEnabled(true);
+                                }
+
+                                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(LostDetailActivity.this);
+                                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                                mImageAdapter = new ImageHorizontalViewAdapter(imgPaths);
+                                images.setLayoutManager(linearLayoutManager);
+                                images.setAdapter(mImageAdapter);
+
+                                invalidateOptionsMenu();
                             }
+                        });
+                    }
 
-                            if (mLostItem.getUserId().equals(myId)){
-                                connectButton.setBackgroundResource(R.drawable.ic_connect_unable);
-                                connectButton.setEnabled(false);
-                            }else {
-                                connectButton.setBackgroundResource(R.drawable.ic_connect);
-                                connectButton.setEnabled(true);
-                            }
-
-                            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(LostDetailActivity.this);
-                            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                            mImageAdapter = new ImageHorizontalViewAdapter(imgPaths);
-                            images.setLayoutManager(linearLayoutManager);
-                            images.setAdapter(mImageAdapter);
-
-                            invalidateOptionsMenu();
-                        }
-                    });
                 }
             }
         });
@@ -378,10 +442,11 @@ public class LostDetailActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(LostDetailActivity.this, "暂时没有评论", Toast.LENGTH_SHORT).show();
+                                nullViewPoint.setVisibility(View.VISIBLE);
                             }
                         });
                     }else {
+                        nullViewPoint.setVisibility(View.INVISIBLE);
                         Gson gson = new Gson();
                         mViewPointItems = gson.fromJson(responseData,
                                 new TypeToken<List<ViewPointItem>>() {
@@ -570,6 +635,40 @@ public class LostDetailActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Toast.makeText(LostDetailActivity.this, "操作成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void sendReport(String keyId, String reason, String userId){
+        String address = getString(R.string.server_ip) + "newReportServlet";
+        RequestBody requestBody = new FormBody.Builder()
+                .add("keyId", keyId)
+                .add("label", "Lost")
+                .add("reason", reason)
+                .add("userId", userId)
+                .build();
+        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LostDetailActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()){
+                    String responseData = response.body().string();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LostDetailActivity.this, "后台已收到您的举报", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

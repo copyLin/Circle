@@ -123,6 +123,7 @@ public class NewLostActivity extends AppCompatActivity {
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_cancel);
+            actionBar.setTitle("发布寻物");
         }
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 3);

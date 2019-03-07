@@ -113,7 +113,7 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder dialog3 = new AlertDialog.Builder(SettingActivity.this);
-                dialog3.setMessage("点击确定，突出当前用户");
+                dialog3.setMessage("点击确定，退出当前用户");
                 dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

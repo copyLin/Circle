@@ -57,11 +57,11 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
         public void handleMessage(Message message) {
             switch (message.what) {
                 case CONTROL_SUCCESS:
-                    Toast.makeText(MyApplication.getContext(), "操作成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MyApplication.getContext(), "删除成功", Toast.LENGTH_SHORT).show();
                     notifyDataSetChanged();
                     break;
                 case CONTROL_FAIL:
-                    Toast.makeText(MyApplication.getContext(), "操作失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MyApplication.getContext(), "删除失败", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
@@ -145,7 +145,7 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
                     int position = holder.getAdapterPosition();
                     final CollectionItem collectionItem = mCollectionItems.get(position);
                     PopupMenu popupMenu = new PopupMenu(mContext,v);
-                    popupMenu.getMenuInflater().inflate(R.menu.menu_popup, popupMenu.getMenu());
+                    popupMenu.getMenuInflater().inflate(R.menu.menu_delete, popupMenu.getMenu());
                     popupMenu.show();
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
@@ -180,11 +180,6 @@ public class MyCollectionsAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                         }
                     });
-
-                    popupMenu.getMenu().findItem(R.id.hide).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.open).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.like).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.report).setVisible(false);
                     return false;
                 }
             });

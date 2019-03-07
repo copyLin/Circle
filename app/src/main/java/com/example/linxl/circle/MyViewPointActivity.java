@@ -119,7 +119,7 @@ public class MyViewPointActivity extends AppCompatActivity {
                         items = gson.fromJson(responseData,
                                 new TypeToken<List<ViewPointItem>>(){}.getType());
                         ViewPointItem item = items.get(items.size() - 1);
-                        currentId = item.getKeyId();
+                        currentId = item.getViewPointId();
                         allItems.addAll(items);
                         runOnUiThread(new Runnable() {
                             @Override
