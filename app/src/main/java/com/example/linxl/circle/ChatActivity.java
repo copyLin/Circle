@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -148,6 +149,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatReceiver = new ChatReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.linxl.circle.NEW_MESSAGE");
+        intentFilter.addAction("com.example.linxl.circle.SOCKET_RECONNECT");
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(MyApplication.getContext());
         mLocalBroadcastManager.registerReceiver(mChatReceiver, intentFilter);
     }
@@ -234,15 +236,25 @@ public class ChatActivity extends AppCompatActivity {
     class ChatReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent){
-            ChatItem item = (ChatItem) intent.getSerializableExtra("new_msg");
-            if (item.getFromId().equals(fromId) || item.getFromId().equals(toId)) {
-                mChatItems.add(item);
-                mRecyclerView.scrollToPosition(mChatItems.size()-1);
-                mChatAdapter.notifyDataSetChanged();
-                //item.setFlag(true);
-                //item.save();
+            if (intent.getAction().equals("com.example.linxl.circle.NEW_MESSAGE")){
+                ChatItem item = (ChatItem) intent.getSerializableExtra("new_msg");
+                if (item.getFromId().equals(fromId) || item.getFromId().equals(toId)) {
+                    mChatItems.add(item);
+                    mRecyclerView.scrollToPosition(mChatItems.size()-1);
+                    mChatAdapter.notifyDataSetChanged();
+                }
+            }else if (intent.getAction().equals("com.example.linxl.circle.SOCKET_RECONNECT")) {
+                Snackbar.make(mRecyclerView, "socket连接出了点问题，刷新试试", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("刷新", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mChatBinder.reconnect();
+                            }
+                        }).show();
             }
+
 
         }
     }
+
 }

@@ -68,8 +68,6 @@ public class LoginActivity extends AppCompatActivity {
                                         case "LoginSuccess":
                                             String id = userId.getText().toString();
                                             requestForUserInformation(id);
-                                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                                            finish();
                                             break;
                                         case "WrongNumber":
                                             Toast.makeText(LoginActivity.this, "账号或密码错误", Toast.LENGTH_SHORT).show();
@@ -120,7 +118,9 @@ public class LoginActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                             LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
                         }
                     });
                 }

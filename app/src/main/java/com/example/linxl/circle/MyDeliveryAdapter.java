@@ -280,8 +280,7 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void deleteMyDelivery(final DeliveryItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "deleteDeliveryServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getDeliveryId())
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -307,8 +306,7 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void hideMyDelivery(final DeliveryItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateDeliveryFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getDeliveryId())
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -335,8 +333,7 @@ public class MyDeliveryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void openMyDelivery(final DeliveryItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateDeliveryFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getDeliveryId())
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {

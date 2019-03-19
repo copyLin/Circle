@@ -110,6 +110,7 @@ public class LostDetailActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+        toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_popup));
 
         Intent intent = getIntent();
         keyId = intent.getStringExtra("keyId");
@@ -226,8 +227,6 @@ public class LostDetailActivity extends AppCompatActivity {
             menu.findItem(R.id.report).setVisible(false);
         }
 
-
-
         return true;
     }
 
@@ -243,7 +242,7 @@ public class LostDetailActivity extends AppCompatActivity {
                 dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        deleteMyLost(mLostItem.getUserId(), mLostItem.getSendTime());
+                        deleteMyLost(keyId);
                     }
                 });
                 dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -260,7 +259,7 @@ public class LostDetailActivity extends AppCompatActivity {
                 dialog2.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        hideMyLost(mLostItem.getUserId(), mLostItem.getSendTime());
+                        hideMyLost(keyId);
                     }
                 });
                 dialog2.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -277,7 +276,7 @@ public class LostDetailActivity extends AppCompatActivity {
                 dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        openMyLost(mLostItem.getUserId(), mLostItem.getSendTime());
+                        openMyLost(keyId);
                     }
                 });
                 dialog3.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -386,6 +385,8 @@ public class LostDetailActivity extends AppCompatActivity {
                                 nullContent.setVisibility(View.VISIBLE);
                                 itemDetailLayout.setVisibility(View.INVISIBLE);
                                 contentState = false;
+                                inputText.setFocusable(false);
+                                sendButton.setEnabled(false);
                                 invalidateOptionsMenu();
 
                             }
@@ -528,11 +529,10 @@ public class LostDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void deleteMyLost(String userId, String sendTime) {
+    private void deleteMyLost(String keyId) {
         String address = getString(R.string.server_ip) + "deleteLostServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -560,11 +560,10 @@ public class LostDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void hideMyLost(String userId, String sendTime) {
+    private void hideMyLost(String keyId) {
         String address = getString(R.string.server_ip) + "updateLostFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -593,11 +592,10 @@ public class LostDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void openMyLost(String userId, String sendTime) {
+    private void openMyLost(String keyId) {
         String address = getString(R.string.server_ip) + "updateLostFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -684,11 +682,11 @@ public class LostDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
+                    final String responseData = response.body().string();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(LostDetailActivity.this, "后台已收到您的举报", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LostDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

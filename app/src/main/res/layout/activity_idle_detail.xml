@@ -218,7 +218,8 @@
             android:layout_marginRight="10dp"
             android:hint="@string/hint_viewpoint"
             android:background="@drawable/edit_text_background"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:maxLength="120"/>
 
         <ImageButton
             android:id="@+id/send"

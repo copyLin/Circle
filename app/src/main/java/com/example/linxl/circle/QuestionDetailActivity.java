@@ -105,6 +105,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+        toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_popup));
 
         Intent intent = getIntent();
         keyId = intent.getStringExtra("keyId");
@@ -237,7 +238,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        deleteMyQuestion(mQuestionItem.getUserId(), mQuestionItem.getSendTime());
+                        deleteMyQuestion(keyId);
                     }
                 });
                 dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -254,7 +255,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 dialog2.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        hideMyQuestion(mQuestionItem.getUserId(), mQuestionItem.getSendTime());
+                        hideMyQuestion(keyId);
                     }
                 });
                 dialog2.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -271,7 +272,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        openMyQuestion(mQuestionItem.getUserId(), mQuestionItem.getSendTime());
+                        openMyQuestion(keyId);
                     }
                 });
                 dialog3.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -381,6 +382,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
                                 nullContent.setVisibility(View.VISIBLE);
                                 itemDetailLayout.setVisibility(View.INVISIBLE);
                                 contentState = false;
+                                inputText.setFocusable(false);
+                                sendButton.setEnabled(false);
                                 invalidateOptionsMenu();
                             }
                         });
@@ -522,11 +525,10 @@ public class QuestionDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void deleteMyQuestion(String userId, String sendTime) {
+    private void deleteMyQuestion(String keyId) {
         String address = getString(R.string.server_ip) + "deleteQuestionServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -555,11 +557,10 @@ public class QuestionDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void hideMyQuestion(String userId, String sendTime) {
+    private void hideMyQuestion(String keyId) {
         String address = getString(R.string.server_ip) + "updateQuestionFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -588,11 +589,10 @@ public class QuestionDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void openMyQuestion(String userId, String sendTime) {
+    private void openMyQuestion(String keyId) {
         String address = getString(R.string.server_ip) + "updateQuestionFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -680,11 +680,11 @@ public class QuestionDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
+                    final String responseData = response.body().string();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(QuestionDetailActivity.this, "后台已收到您的举报", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(QuestionDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

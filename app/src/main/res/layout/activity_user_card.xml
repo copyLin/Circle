@@ -51,17 +51,26 @@
                 <TextView
                     android:id="@+id/user_id"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"/>
 
             </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/button_send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:background="@drawable/ic_connect"/>
 
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_margin="8dp"
-            android:background="@color/toolbarBackground"/>
+            android:layout_height="0.5dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/navHeader"/>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -72,13 +81,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/user_department"
-                android:textSize="16dp"/>
+                android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/user_department"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -92,13 +102,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/user_major"
-                android:textSize="16dp"/>
+                android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/user_major"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -111,24 +122,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/user_words"
-                android:textSize="16dp"/>
+                android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/user_words"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/button_send"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:text="发消息"/>
 
 </LinearLayout>

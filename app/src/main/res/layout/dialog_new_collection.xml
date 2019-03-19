@@ -16,6 +16,7 @@
         android:id="@+id/collection_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="1"/>
+        android:maxLines="1"
+        android:maxLength="120"/>
 
 </LinearLayout>

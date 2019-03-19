@@ -1,11 +1,21 @@
 package com.example.linxl.circle;
 
+import android.app.Dialog;
 import android.app.Service;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.example.linxl.circle.gson.ChatItem;
 import com.example.linxl.circle.utils.SPUtil;
@@ -55,27 +65,48 @@ public class ChatService extends Service {
                 @Override
                 public void run() {
                     try {
-                        if (socket.isConnected()) {
-                            if (!socket.isOutputShutdown()) {
-                                String jsonData  = mGson.toJson(item);
-                                Log.d("———ChatService———", "jsonData" + jsonData);
-                                out.write(jsonData + "\n");
-                                out.flush();
+                        if (isConnected(socket)){
+                            String jsonData  = mGson.toJson(item);
+                            out.write(jsonData + "\n");
+                            out.flush();
 
-                                Intent intent = new Intent("com.example.linxl.circle.NEW_MESSAGE");
-                                intent.putExtra("new_msg", item);
-                                mLocalBroadcastManager.sendBroadcast(intent);
-                            } else {
-                                Log.d("———ChatService———", "输出流断开");
-                            }
+                            Intent intent = new Intent("com.example.linxl.circle.NEW_MESSAGE");
+                            intent.putExtra("new_msg", item);
+                            mLocalBroadcastManager.sendBroadcast(intent);
+
+                            Log.d("———ChatService———", "jsonData" + jsonData);
                         } else {
-                            Log.d("———ChatService———", "socket连接断开");
+                            Intent intent = new Intent("com.example.linxl.circle.SOCKET_RECONNECT");
+                            mLocalBroadcastManager.sendBroadcast(intent);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }).start();
+        }
+
+        public void reconnect() {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        socket = new Socket(HOST, PORT);
+                        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8"));
+                        in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf-8"));
+                        if (isConnected(socket)){
+                            out.write("enter:" + userId + "\n");
+                            out.flush();
+                        }else {
+                            Intent intent = new Intent("com.example.linxl.circle.SOCKET_RECONNECT");
+                            mLocalBroadcastManager.sendBroadcast(intent);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
         }
     }
 
@@ -101,30 +132,16 @@ public class ChatService extends Service {
             public void run() {
                 connection();
                 try {
-
                     String jsonData;
                     while (flag) {
-                        if (!socket.isClosed()) {
-                            if (socket.isConnected()) {
-                                if (!socket.isInputShutdown()) {
-                                    if ((jsonData = in.readLine()) != null) {
+                        if ((jsonData = in.readLine()) != null) {
 
-                                        ChatItem item = mGson.fromJson(jsonData, ChatItem.class);
-                                        item.save();
+                            ChatItem item = mGson.fromJson(jsonData, ChatItem.class);
+                            item.save();
 
-                                        Intent intent = new Intent("com.example.linxl.circle.NEW_MESSAGE");
-                                        intent.putExtra("new_msg", item);
-                                        mLocalBroadcastManager.sendBroadcast(intent);
-
-                                    }
-                                } else {
-                                    Log.d("———ChatService———", "输入流断开");
-                                }
-                            } else {
-                                Log.d("———ChatService———", "socket连接断开");
-                            }
-                        } else {
-                            Log.d("———ChatService———", "socket关闭");
+                            Intent intent = new Intent("com.example.linxl.circle.NEW_MESSAGE");
+                            intent.putExtra("new_msg", item);
+                            mLocalBroadcastManager.sendBroadcast(intent);
                         }
                     }
                 } catch (Exception e) {
@@ -144,13 +161,14 @@ public class ChatService extends Service {
             @Override
             public void run() {
                 try {
-                    if (socket != null) {
-                        if (!socket.isOutputShutdown()) {
-                            out.write("exit:" + userId + "\n");
-                            out.flush();
-                        }
+
+                    if (isConnected(socket)) {
+                        out.write("exit:" + userId + "\n");
+                        out.flush();
                     }
+
                     flag = false;
+
                     if (in != null){
                         in.close();
                     }
@@ -178,11 +196,25 @@ public class ChatService extends Service {
             socket = new Socket(HOST, PORT);
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "utf-8"));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf-8"));
-            out.write("enter:" + userId + "\n");
-            out.flush();
-        } catch (IOException e) {
+            if (isConnected(socket)){
+                out.write("enter:" + userId + "\n");
+                out.flush();
+            }else {
+                Intent intent = new Intent("com.example.linxl.circle.SOCKET_RECONNECT");
+                mLocalBroadcastManager.sendBroadcast(intent);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    private Boolean isConnected(Socket socket){
+        try{
+            socket.sendUrgentData(0xFF);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
     }
 }

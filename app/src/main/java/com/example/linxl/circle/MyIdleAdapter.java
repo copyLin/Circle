@@ -283,8 +283,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private void deleteMyIdle(final IdleItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "deleteIdleServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getIdleId())
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -310,8 +309,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private void hideMyIdle(final IdleItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateIdleFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getIdleId())
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -338,8 +336,7 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private void openMyIdle(final IdleItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateIdleFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getIdleId())
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {

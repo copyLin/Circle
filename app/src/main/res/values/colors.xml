@@ -8,4 +8,5 @@
     <color name="navHeader">#616161</color>
     <color name="colorTheme">#009688</color>
     <color name="colorDark">#333333</color>
+    <color name="colorRed">#FF3B30</color>
 </resources>

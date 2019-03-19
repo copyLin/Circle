@@ -2,14 +2,18 @@ package com.example.linxl.circle;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -45,14 +49,28 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;
-    private RecyclerView mRecyclerView;
     private FloatingActionButton mFloatingActionButton;
     private BottomNavigationView mBottomNavigationView;
     private ViewPager mViewPager;
     private MenuItem mMenuItem;
 
+    private ChatService.ChatBinder mChatBinder;
+    private MainReceiver mMainReceiver;
+
     private Intent serviceIntent;
     private String userId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mChatBinder = (ChatService.ChatBinder) iBinder;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         CircleImageView userImage = navHeader.findViewById(R.id.user_image);
         TextView userName = navHeader.findViewById(R.id.user_name);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mFloatingActionButton = (FloatingActionButton) findViewById(R.id.float_button);
         mBottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -180,12 +197,14 @@ public class MainActivity extends AppCompatActivity {
 
         serviceIntent = new Intent(this, ChatService.class);
         startService(serviceIntent);
+        bindService(serviceIntent, mConnection, BIND_AUTO_CREATE);
 
-        MessageReceiver messageReceiver = new MessageReceiver();
+        mMainReceiver = new MainReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.linxl.circle.NEW_MESSAGE");
+        intentFilter.addAction("com.example.linxl.circle.SOCKET_RECONNECT");
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(MyApplication.getContext());
-        localBroadcastManager.registerReceiver(messageReceiver, intentFilter);
+        localBroadcastManager.registerReceiver(mMainReceiver, intentFilter);
 
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -249,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy(){
         super.onDestroy();
+        unbindService(mConnection);
         stopService(serviceIntent);
         ActivityCollector.removeAvtivity(this);
 
@@ -256,14 +276,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    class MessageReceiver extends BroadcastReceiver {
+    class MainReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent){
-            ChatItem item = (ChatItem) intent.getSerializableExtra("new_msg");
-            if(item.getFromId().equals(userId)){
+            if (intent.getAction().equals("com.example.linxl.circle.NEW_MESSAGE")){
+                ChatItem item = (ChatItem) intent.getSerializableExtra("new_msg");
+                if(item.getFromId().equals(userId)){
 
-            }else {
-                mFloatingActionButton.setImageResource(R.drawable.ic_chat_new);
+                }else {
+                    mFloatingActionButton.setImageResource(R.drawable.ic_chat_new);
+                }
+            }else if (intent.getAction().equals("com.example.linxl.circle.SOCKET_RECONNECT")) {
+                Snackbar.make(mBottomNavigationView, "socket连接出了点问题，刷新试试", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("刷新", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mChatBinder.reconnect();
+                            }
+                        }).show();
             }
         }
     }

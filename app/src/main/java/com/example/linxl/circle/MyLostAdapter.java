@@ -286,8 +286,7 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private void deleteMyLost(final LostItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "deleteLostServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getLostId())
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -313,8 +312,7 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private void hideMyLost(final LostItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateLostFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getLostId())
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -341,8 +339,7 @@ public class MyLostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private void openMyLost(final LostItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateLostFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getLostId())
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {

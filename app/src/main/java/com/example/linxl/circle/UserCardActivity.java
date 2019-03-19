@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,8 +36,10 @@ public class UserCardActivity extends AppCompatActivity {
     private TextView userDepartment;
     private TextView userMajor;
     private TextView userWords;
+    private ImageButton sendButton;
 
     private UserItem mUser;
+    private String myId = (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, "");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,7 @@ public class UserCardActivity extends AppCompatActivity {
         userDepartment = (TextView) findViewById(R.id.user_department);
         userMajor = (TextView) findViewById(R.id.user_major);
         userWords= (TextView) findViewById(R.id.user_words);
-        Button sendButton = (Button) findViewById(R.id.button_send);
+        sendButton = (ImageButton) findViewById(R.id.button_send);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -93,6 +96,13 @@ public class UserCardActivity extends AppCompatActivity {
                             userDepartment.setText(mUser.getDepartment());
                             userMajor.setText(mUser.getMajor());
                             userWords.setText(mUser.getWords());
+                            if (mUser.getUserId().equals(myId)){
+                                sendButton.setBackgroundResource(R.drawable.ic_connect_unable);
+                                sendButton.setEnabled(false);
+                            }else {
+                                sendButton.setBackgroundResource(R.drawable.ic_connect);
+                                sendButton.setEnabled(true);
+                            }
                         }
                     });
                 }

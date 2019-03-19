@@ -22,7 +22,8 @@
             android:id="@+id/item_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/radio_item_1"/>
+            android:text="@string/radio_item_1"
+            android:checked="true" />
         
         <RadioButton
             android:id="@+id/item_2"

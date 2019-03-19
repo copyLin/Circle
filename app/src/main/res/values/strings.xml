@@ -59,6 +59,7 @@
     <string name="new_password">新密码：</string>
     <string name="confirm_password">确认密码：</string>
     <string name="title_new_collection">添加到收藏夹</string>
+    <string name="title_password">密码仅支持数字、字母、小数点（.）及下划线（_）</string>
     <string name="title_report">请选择举报理由</string>
     <string name="radio_item_1">垃圾广告信息</string>
     <string name="radio_item_2">虚假欺诈信息</string>
@@ -66,6 +67,7 @@
     <string name="radio_item_4">辱骂、歧视、挑衅等不友善行为</string>
     <string name="radio_item_5">其他原因</string>
     <string name="unread_viewpoint">查看未读评论</string>
+    <string name="password_character">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._</string>
 
     <string-array name="label_spinner">
         <item>校园话题</item>

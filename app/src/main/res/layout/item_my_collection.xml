@@ -32,7 +32,8 @@
                 android:id="@+id/collection_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:maxLines="1"/>
 
             <View
                 android:layout_width="match_parent"

@@ -108,6 +108,7 @@ public class IdleDetailActivity extends AppCompatActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
             actionBar.setDisplayShowTitleEnabled(false);
         }
+        toolbar.setOverflowIcon(getResources().getDrawable(R.drawable.ic_popup));
 
         Intent intent = getIntent();
         keyId = intent.getStringExtra("keyId");
@@ -241,7 +242,7 @@ public class IdleDetailActivity extends AppCompatActivity {
                 dialog1.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        deleteMyIdle(mIdleItem.getUserId(), mIdleItem.getSendTime());
+                        deleteMyIdle(keyId);
                     }
                 });
                 dialog1.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -258,7 +259,7 @@ public class IdleDetailActivity extends AppCompatActivity {
                 dialog2.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        hideMyIdle(mIdleItem.getUserId(), mIdleItem.getSendTime());
+                        hideMyIdle(keyId);
                     }
                 });
                 dialog2.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -275,7 +276,7 @@ public class IdleDetailActivity extends AppCompatActivity {
                 dialog3.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        openMyIdle(mIdleItem.getUserId(), mIdleItem.getSendTime());
+                        openMyIdle(keyId);
                     }
                 });
                 dialog3.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -383,6 +384,10 @@ public class IdleDetailActivity extends AppCompatActivity {
                             public void run() {
                                 nullContent.setVisibility(View.VISIBLE);
                                 itemDetailLayout.setVisibility(View.INVISIBLE);
+                                contentState = false;
+                                inputText.setFocusable(false);
+                                sendButton.setEnabled(false);
+                                invalidateOptionsMenu();
                             }
                         });
                     }else {
@@ -521,11 +526,10 @@ public class IdleDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void deleteMyIdle(String userId, String sendTime) {
+    private void deleteMyIdle(String keyId) {
         String address = getString(R.string.server_ip) + "deleteIdleServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -553,11 +557,10 @@ public class IdleDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void hideMyIdle(String userId, String sendTime) {
+    private void hideMyIdle(String keyId) {
         String address = getString(R.string.server_ip) + "updateIdleFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -586,11 +589,10 @@ public class IdleDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void openMyIdle(String userId, String sendTime) {
+    private void openMyIdle(String keyId) {
         String address = getString(R.string.server_ip) + "updateIdleFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", userId)
-                .add("sendTime", sendTime)
+                .add("id", keyId)
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -677,11 +679,11 @@ public class IdleDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()){
-                    String responseData = response.body().string();
+                    final String responseData = response.body().string();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(IdleDetailActivity.this, "后台已收到您的举报", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(IdleDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

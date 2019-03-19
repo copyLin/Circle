@@ -97,7 +97,9 @@ public class NewLostActivity extends AppCompatActivity {
                 new DatePickerDialog(NewLostActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        date.setText(year + "-" + month + "-" + dayOfMonth);
+                        int monthOfYear = month + 1;
+                        String dateString = year + "-" + monthOfYear + "-" + dayOfMonth;
+                        date.setText(dateString);
                     }
                 }, y,m,d).show();
             }
@@ -106,7 +108,7 @@ public class NewLostActivity extends AppCompatActivity {
         timeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int h = calendar.get(Calendar.HOUR);
+                int h = calendar.get(Calendar.HOUR_OF_DAY);
                 int m = calendar.get(Calendar.MINUTE);
 
                 new TimePickerDialog(NewLostActivity.this, new TimePickerDialog.OnTimeSetListener() {

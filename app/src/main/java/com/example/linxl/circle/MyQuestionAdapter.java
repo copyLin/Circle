@@ -296,8 +296,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void deleteMyQuestion(final QuestionItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "deleteQuestionServlet";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getQuestionId())
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
             @Override
@@ -325,8 +324,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void hideMyQuestion(final QuestionItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateQuestionFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getQuestionId())
                 .add("flag", "true")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
@@ -355,8 +353,7 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private void openMyQuestion(final QuestionItem item) {
         String address = mContext.getResources().getString(R.string.server_ip) + "updateQuestionFlag";
         RequestBody requestBody = new FormBody.Builder()
-                .add("userId", item.getUserId())
-                .add("sendTime", item.getSendTime())
+                .add("id", item.getQuestionId())
                 .add("flag", "false")
                 .build();
         HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
