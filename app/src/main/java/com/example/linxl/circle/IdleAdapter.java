@@ -126,6 +126,8 @@ public class IdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             ((NormalViewHolder) holder).idlePrice.setText("¥ " + idleItem.getPrice());
             if (!idleItem.getIdleImgs().isEmpty()) {
                 Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/" + idleItem.getUserId() + "/" + idleItem.getIdleImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
+            }else {
+                Glide.with(mContext).load(R.drawable.img_idle).into(((NormalViewHolder) holder).mImageView);
             }
             if (idleItem.getUserId().equals(userId)) {
                 ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);

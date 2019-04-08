@@ -6,11 +6,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +16,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -46,6 +45,7 @@ import okhttp3.Response;
 
 public class LostDetailActivity extends AppCompatActivity {
 
+    private ProgressBar mProgressBar;
     private CircleImageView mCircleImageView;
     private TextView userName;
     private TextView sendTime;
@@ -83,6 +83,7 @@ public class LostDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_lost_detail);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
         mCircleImageView = (CircleImageView) findViewById(R.id.user_image);
         userName = (TextView) findViewById(R.id.user_name);
         sendTime = (TextView) findViewById(R.id.send_time);
@@ -131,42 +132,56 @@ public class LostDetailActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String address = getString(R.string.server_ip) + "newViewPointServlet";
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("keyId", mLostItem.getLostId())
-                        .add("label", "Lost")
-                        .add("toId", mLostItem.getUserId())
-                        .add("content", inputText.getText().toString())
-                        .add("userId", (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, ""))
-                        .add("sendTime", TimeCapture.getChinaTime())
-                        .build();
-                HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(LostDetailActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                mProgressBar.setVisibility(View.VISIBLE);
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()){
-                            final String responseData = response.body().string();
+                String content = inputText.getText().toString();
+                if (content.equals("")){
+                    Toast.makeText(LostDetailActivity.this, "请输入评论信息", Toast.LENGTH_SHORT).show();
+                }else {
+                    String address = getString(R.string.server_ip) + "newViewPointServlet";
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("keyId", mLostItem.getLostId())
+                            .add("label", "Lost")
+                            .add("toId", mLostItem.getUserId())
+                            .add("content", content)
+                            .add("userId", (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, ""))
+                            .add("sendTime", TimeCapture.getChinaTime())
+                            .build();
+
+                    mProgressBar.setProgress(60);
+
+                    HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    inputText.setText("");
-                                    hideKeyboard();
-                                    Toast.makeText(LostDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
-                                    getItemViewPoint(keyId, label);
+                                    mProgressBar.setProgress(100);
+                                    mProgressBar.setVisibility(View.INVISIBLE);
+                                    Toast.makeText(LostDetailActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
-                    }
-                });
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if (response.isSuccessful()){
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mProgressBar.setProgress(100);
+                                        mProgressBar.setVisibility(View.INVISIBLE);
+                                        inputText.setText("");
+                                        hideKeyboard();
+                                        Toast.makeText(LostDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
+                                        getItemViewPoint(keyId, label);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+
             }
         });
 
@@ -467,7 +482,6 @@ public class LostDetailActivity extends AppCompatActivity {
                             }
                         });
                     }else {
-                        nullViewPoint.setVisibility(View.INVISIBLE);
                         Gson gson = new Gson();
                         mViewPointItems = gson.fromJson(responseData,
                                 new TypeToken<List<ViewPointItem>>() {
@@ -476,6 +490,7 @@ public class LostDetailActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                nullViewPoint.setVisibility(View.INVISIBLE);
                                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(LostDetailActivity.this);
                                 mViewPointAdapter = new ViewPointAdapter(mViewPointItems);
                                 viewPoint.setLayoutManager(linearLayoutManager);
@@ -661,37 +676,42 @@ public class LostDetailActivity extends AppCompatActivity {
     }
 
     private void sendReport(String keyId, String reason, String userId){
-        String address = getString(R.string.server_ip) + "newReportServlet";
-        RequestBody requestBody = new FormBody.Builder()
-                .add("keyId", keyId)
-                .add("label", "Lost")
-                .add("reason", reason)
-                .add("userId", userId)
-                .build();
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(LostDetailActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+        if (reason.equals("")){
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()){
-                    final String responseData = response.body().string();
+        }else {
+            String address = getString(R.string.server_ip) + "newReportServlet";
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("keyId", keyId)
+                    .add("label", "Lost")
+                    .add("reason", reason)
+                    .add("userId", userId)
+                    .build();
+            HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(LostDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LostDetailActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()){
+                        final String responseData = response.body().string();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(LostDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
     }
 
     private void showKeyboard(EditText editText){

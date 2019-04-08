@@ -2,6 +2,8 @@ package com.example.linxl.circle;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -10,7 +12,6 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -146,39 +147,44 @@ public class NewQuestionActivity extends AppCompatActivity {
                     }
                 }
 
-                RequestBody requestBody = multipartBody.build();
-                String address = getString(R.string.server_ip) + "newQuestionServlet";
+                if (!questionContent.equals("")){
+                    RequestBody requestBody = multipartBody.build();
+                    String address = getString(R.string.server_ip) + "newQuestionServlet";
 
-                mProgressBar.setProgress(90);
+                    mProgressBar.setProgress(60);
 
-                HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        NewQuestionActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressBar.setProgress(100);
-                                mProgressBar.setVisibility(View.INVISIBLE);
-                                Toast.makeText(NewQuestionActivity.this, "信息发送失败", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
+                    HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
                             NewQuestionActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     mProgressBar.setProgress(100);
-                                    Toast.makeText(NewQuestionActivity.this, "信息发送成功", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    mProgressBar.setVisibility(View.INVISIBLE);
+                                    Toast.makeText(NewQuestionActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
 
-                    }
-                });
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if (response.isSuccessful()) {
+                                NewQuestionActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mProgressBar.setProgress(100);
+                                        Toast.makeText(NewQuestionActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                });
+                            }
+
+                        }
+                    });
+                }else {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(NewQuestionActivity.this, "请将内容填写完整", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
                 break;

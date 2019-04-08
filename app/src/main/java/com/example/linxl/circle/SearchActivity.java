@@ -7,7 +7,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -79,7 +78,13 @@ public class SearchActivity extends AppCompatActivity {
         mImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getSearchResult(selectedLab, mEditText.getText().toString());
+                String searchText = mEditText.getText().toString();
+                if (searchText.equals("")){
+
+                }else {
+                    getSearchResult(selectedLab, searchText);
+                }
+
             }
         });
     }
@@ -105,6 +110,7 @@ public class SearchActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 nullResult.setVisibility(View.VISIBLE);
+                                mRecyclerView.setVisibility(View.INVISIBLE);
                             }
                         });
                     }else {
@@ -120,6 +126,7 @@ public class SearchActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         nullResult.setVisibility(View.INVISIBLE);
+                                        mRecyclerView.setVisibility(View.VISIBLE);
                                         mRecyclerView.setLayoutManager(questionManager);
                                         mRecyclerView.setAdapter(questionAdapter);
                                         questionAdapter.changeState(1);
@@ -137,6 +144,7 @@ public class SearchActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         nullResult.setVisibility(View.INVISIBLE);
+                                        mRecyclerView.setVisibility(View.VISIBLE);
                                         mRecyclerView.setLayoutManager(lostManager);
                                         mRecyclerView.setAdapter(lostAdapter);
                                         lostAdapter.changeState(1);
@@ -153,6 +161,7 @@ public class SearchActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         nullResult.setVisibility(View.INVISIBLE);
+                                        mRecyclerView.setVisibility(View.VISIBLE);
                                         mRecyclerView.setLayoutManager(idleManager);
                                         mRecyclerView.setAdapter(idleAdapter);
                                         idleAdapter.changeState(1);
@@ -169,6 +178,7 @@ public class SearchActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         nullResult.setVisibility(View.INVISIBLE);
+                                        mRecyclerView.setVisibility(View.VISIBLE);
                                         mRecyclerView.setLayoutManager(deliveryManager);
                                         mRecyclerView.setAdapter(deliveryAdapter);
                                         deliveryAdapter.changeState(1);

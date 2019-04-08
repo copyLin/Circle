@@ -27,8 +27,6 @@ import okhttp3.Response;
 
 public class NewDeliveryActivity extends AppCompatActivity {
 
-    public static final int TAKE_PHOTO = 0;
-    public static final int CHOOSE_PHOTO = 1;
     private ProgressBar mProgressBar;
     private EditText content;
     private EditText price;
@@ -73,44 +71,49 @@ public class NewDeliveryActivity extends AppCompatActivity {
                 String deliveryPrice = price.getText().toString();
                 String sendTime = TimeCapture.getChinaTime();
 
-                mProgressBar.setProgress(50);
+                if (!deliveryContent.equals("") && !deliveryPrice.equals("")){
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("userId", userId)
+                            .add("content", deliveryContent)
+                            .add("price", deliveryPrice)
+                            .add("sendTime", sendTime)
+                            .build();
+                    String address = getString(R.string.server_ip) + "newDeliveryServlet";
 
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("userId", userId)
-                        .add("content", deliveryContent)
-                        .add("price", deliveryPrice)
-                        .add("sendTime", sendTime)
-                        .build();
-                String address = getString(R.string.server_ip) + "newDeliveryServlet";
+                    mProgressBar.setProgress(60);
 
-                HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        NewDeliveryActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressBar.setProgress(100);
-                                mProgressBar.setVisibility(View.INVISIBLE);
-                                Toast.makeText(NewDeliveryActivity.this, "信息发送失败", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
+                    HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
                             NewDeliveryActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     mProgressBar.setProgress(100);
-                                    Toast.makeText(NewDeliveryActivity.this, "信息发送成功", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    mProgressBar.setVisibility(View.INVISIBLE);
+                                    Toast.makeText(NewDeliveryActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
 
-                    }
-                });
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if (response.isSuccessful()) {
+                                NewDeliveryActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mProgressBar.setProgress(100);
+                                        Toast.makeText(NewDeliveryActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                });
+                            }
+
+                        }
+                    });
+                }else {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(NewDeliveryActivity.this, "请将内容填写完整", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
                 break;

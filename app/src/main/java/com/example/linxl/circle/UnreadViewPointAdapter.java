@@ -12,18 +12,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.ViewPointItem;
-import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 
-import java.io.IOException;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 /**
  * Created by Linxl on 2019/1/20.

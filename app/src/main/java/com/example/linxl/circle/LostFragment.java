@@ -4,7 +4,6 @@ package com.example.linxl.circle;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -13,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.linxl.circle.gson.IdleItem;
 import com.example.linxl.circle.gson.LostItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.google.gson.Gson;

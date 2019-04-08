@@ -1,46 +1,22 @@
 package com.example.linxl.circle;
 
-import android.app.Dialog;
 import android.app.Service;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.example.linxl.circle.gson.ChatItem;
 import com.example.linxl.circle.utils.SPUtil;
 import com.google.gson.Gson;
 
-import org.litepal.crud.DataSupport;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class ChatService extends Service {
 

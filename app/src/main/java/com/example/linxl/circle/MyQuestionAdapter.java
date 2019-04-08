@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -24,7 +23,6 @@ import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.QuestionItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
-import com.example.linxl.circle.utils.TimeCapture;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -249,10 +247,16 @@ public class MyQuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     imgPaths.add(mContext.getResources().getString(R.string.server_ip) + "image/" + questionItem.getUserId() + "/" + imgPath);
                 }
                 GridLayoutManager layoutManager = new GridLayoutManager(mContext, 3);
-                ImageAdapter adapter = new ImageAdapter(imgPaths);
+                ImageGridViewAdapter adapter = new ImageGridViewAdapter(imgPaths);
                 ((NormalViewHolder) holder).mRecyclerView.setLayoutManager(layoutManager);
                 ((NormalViewHolder) holder).mRecyclerView.setAdapter(adapter);
 
+            }else {
+                List<String> imgPaths = new ArrayList<>();
+                GridLayoutManager layoutManager = new GridLayoutManager(mContext, 3);
+                ImageAdapter adapter = new ImageAdapter(imgPaths);
+                ((NormalViewHolder) holder).mRecyclerView.setLayoutManager(layoutManager);
+                ((NormalViewHolder) holder).mRecyclerView.setAdapter(adapter);
             }
         }else if (holder instanceof FooterViewHolder){
             if (position == 0) {

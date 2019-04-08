@@ -18,7 +18,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.CollectionItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
@@ -26,7 +25,6 @@ import com.example.linxl.circle.utils.SPUtil;
 import java.io.IOException;
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;

@@ -142,6 +142,8 @@ public class LostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             ((NormalViewHolder) holder).contact.setText(lostItem.getContact());
             if (!lostItem.getLostImgs().isEmpty()) {
                 Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/" + lostItem.getUserId() + "/" + lostItem.getLostImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
+            }else {
+                Glide.with(mContext).load(R.drawable.img_lost).into(((NormalViewHolder) holder).mImageView);
             }
             if (lostItem.getUserId().equals(userId)) {
                 ((NormalViewHolder) holder).connectButton.setBackgroundResource(R.drawable.ic_connect_unable);

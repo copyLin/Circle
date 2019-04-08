@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="toolbarMain">#F5F5F5</color>
     <color name="toolbarBackground">#E0E0E0</color>
+    <color name="colorGray">#BBB9B9</color>
     <color name="navHeader">#616161</color>
     <color name="colorTheme">#009688</color>
     <color name="colorDark">#333333</color>

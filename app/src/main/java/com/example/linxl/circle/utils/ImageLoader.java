@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.DocumentsContract;
@@ -19,7 +21,10 @@ import android.widget.Toast;
 import com.example.linxl.circle.MyApplication;
 import com.example.linxl.circle.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -79,6 +84,33 @@ public class ImageLoader {
 
     public String handleTakenPhoto(){
         String imagePath = imageUri.getPath();
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap origin = BitmapFactory.decodeFile(imagePath);
+        int height = origin.getHeight();
+        int width = origin.getWidth();
+
+        if (height > 4096 || width > 4096){
+            if (height > 8192 || width > 8192){
+                options.inSampleSize = 4;
+                Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+                try{
+                    FileOutputStream outputStream = new FileOutputStream(imagePath);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                }catch (FileNotFoundException e){
+                    e.printStackTrace();
+                }
+            }else {
+                options.inSampleSize = 2;
+                Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+                try{
+                    FileOutputStream outputStream = new FileOutputStream(imagePath);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                }catch (FileNotFoundException e){
+                    e.printStackTrace();
+                }
+            }
+
+        }
         return imagePath;
     }
 
@@ -102,12 +134,58 @@ public class ImageLoader {
         }else if ("file".equalsIgnoreCase(uri.getScheme())){
             imagePath = uri.getPath();
         }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        Bitmap origin = BitmapFactory.decodeFile(imagePath);
+        int height = origin.getHeight();
+        int width = origin.getWidth();
+
+        if (height > 4096 || width > 4096){
+            if (height > 8192 || width > 8192){
+                options.inSampleSize = 4;
+                Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+                try{
+                    FileOutputStream outputStream = new FileOutputStream(imagePath);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                }catch (FileNotFoundException e){
+                    e.printStackTrace();
+                }
+            }else {
+                options.inSampleSize = 2;
+                Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+                try{
+                    FileOutputStream outputStream = new FileOutputStream(imagePath);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                }catch (FileNotFoundException e){
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
         return imagePath;
     }
 
     public String handleImageBeforeKitKat(Intent data){
         Uri uri = data.getData();
         String imagePath = getImagePath(uri, null);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 2;
+        options.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+        int outHeight = options.outHeight;
+        int outWidth = options.outWidth;
+        if (outHeight > 2500 || outWidth > 2500){
+            try{
+                FileOutputStream outputStream = new FileOutputStream(imagePath);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            }catch (FileNotFoundException e){
+                e.printStackTrace();
+            }
+        }else {
+
+        }
         return imagePath;
     }
 

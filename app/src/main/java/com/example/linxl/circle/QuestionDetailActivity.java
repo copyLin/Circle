@@ -6,7 +6,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,13 +17,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.linxl.circle.gson.CollectionItem;
 import com.example.linxl.circle.gson.QuestionItem;
 import com.example.linxl.circle.gson.ViewPointItem;
 import com.example.linxl.circle.utils.ActivityCollector;
@@ -47,6 +46,7 @@ import okhttp3.Response;
 
 public class QuestionDetailActivity extends AppCompatActivity {
 
+    private ProgressBar mProgressBar;
     private CircleImageView mCircleImageView;
     private TextView userName;
     private TextView sendTime;
@@ -81,6 +81,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActivityCollector.addActivity(this);
         setContentView(R.layout.activity_question_detail);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
         mCircleImageView = (CircleImageView) findViewById(R.id.user_image);
         userName = (TextView) findViewById(R.id.user_name);
         sendTime = (TextView) findViewById(R.id.send_time);
@@ -138,42 +139,57 @@ public class QuestionDetailActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String address = getString(R.string.server_ip) + "newViewPointServlet";
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("keyId", mQuestionItem.getQuestionId())
-                        .add("label", "Question")
-                        .add("toId", mQuestionItem.getUserId())
-                        .add("content", inputText.getText().toString())
-                        .add("userId", (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, ""))
-                        .add("sendTime", TimeCapture.getChinaTime())
-                        .build();
-                HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(QuestionDetailActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                mProgressBar.setVisibility(View.VISIBLE);
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()){
-                            final String responseData = response.body().string();
+                String content = inputText.getText().toString();
+                if (content.equals("")){
+                    Toast.makeText(QuestionDetailActivity.this, "请输入评论信息", Toast.LENGTH_SHORT).show();
+                }else {
+                    String address = getString(R.string.server_ip) + "newViewPointServlet";
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("keyId", mQuestionItem.getQuestionId())
+                            .add("label", "Question")
+                            .add("toId", mQuestionItem.getUserId())
+                            .add("content", content)
+                            .add("userId", (String) SPUtil.getParam(MyApplication.getContext(), SPUtil.USER_ID, ""))
+                            .add("sendTime", TimeCapture.getChinaTime())
+                            .build();
+
+                    mProgressBar.setProgress(60);
+
+                    HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    inputText.setText("");
-                                    hideKeyboard();
-                                    Toast.makeText(QuestionDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
-                                    getItemViewPoint(keyId, label);
+                                    mProgressBar.setProgress(100);
+                                    mProgressBar.setVisibility(View.INVISIBLE);
+                                    Toast.makeText(QuestionDetailActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
-                    }
-                });
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if (response.isSuccessful()){
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mProgressBar.setProgress(100);
+                                        mProgressBar.setVisibility(View.INVISIBLE);
+                                        inputText.setText("");
+                                        hideKeyboard();
+                                        Toast.makeText(QuestionDetailActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
+                                        getItemViewPoint(keyId, label);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+
+
             }
         });
 
@@ -659,37 +675,42 @@ public class QuestionDetailActivity extends AppCompatActivity {
     }
 
     private void sendReport(String keyId, String reason, String userId){
-        String address = getString(R.string.server_ip) + "newReportServlet";
-        RequestBody requestBody = new FormBody.Builder()
-                .add("keyId", keyId)
-                .add("label", "Question")
-                .add("reason", reason)
-                .add("userId", userId)
-                .build();
-        HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(QuestionDetailActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+        if (reason.equals("")){
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()){
-                    final String responseData = response.body().string();
+        }else {
+            String address = getString(R.string.server_ip) + "newReportServlet";
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("keyId", keyId)
+                    .add("label", "Question")
+                    .add("reason", reason)
+                    .add("userId", userId)
+                    .build();
+            HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(QuestionDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(QuestionDetailActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()){
+                        final String responseData = response.body().string();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(QuestionDetailActivity.this, responseData, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
     }
 
     private void showKeyboard(EditText editText){

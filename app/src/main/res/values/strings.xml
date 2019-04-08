@@ -6,21 +6,20 @@
     <string name="permission_denied">Circle已被禁止权限：SD卡写入</string>
     <string name="server_ip">http://10.29.17.3:8080/CircleServer/</string>
     <string name="content">content...</string>
-    <string name="delivery_price">费用：</string>
+    <string name="delivery_price">跑腿费用：</string>
     <string name="idle_name">物品名称：</string>
-    <string name="idle_price">价格：</string>
+    <string name="idle_price">物品价格：</string>
     <string name="idle_detail">详细描述：</string>
-    <string name="lost_label">类型：</string>
-    <string name="lost_time">时间：</string>
-    <string name="lost_location">地点：</string>
+    <string name="lost_time">丢失时间：</string>
+    <string name="lost_location">丢失地点：</string>
     <string name="lost_contact">联系方式：</string>
-    <string name="lost_detail">更多信息：</string>
+    <string name="lost_detail">详细情况：</string>
     <string name="delivery_content">跑腿任务：</string>
     <string name="data_hint">选择日期</string>
     <string name="time_hint">选择时间</string>
     <string name="hint_viewpoint">发表你的评论...</string>
     <string name="hint_question">发表你的校园话题...</string>
-    <string name="hint_null_content">未找到该内容，或已被删除</string>
+    <string name="hint_null_content">未找到该内容，或该内容已被删除</string>
     <string name="hint_null_viewpoint">暂时没有评论</string>
     <string name="hint_null_contact">尚未有用户向您发送私信</string>
     <string name="hint_null_result">没有找到相关内容:(</string>
@@ -59,7 +58,7 @@
     <string name="new_password">新密码：</string>
     <string name="confirm_password">确认密码：</string>
     <string name="title_new_collection">添加到收藏夹</string>
-    <string name="title_password">密码仅支持数字、字母、小数点（.）及下划线（_）</string>
+    <string name="title_password">密码仅支持数字、字母、小数点( . )及下划线( _ )</string>
     <string name="title_report">请选择举报理由</string>
     <string name="radio_item_1">垃圾广告信息</string>
     <string name="radio_item_2">虚假欺诈信息</string>
@@ -74,13 +73,6 @@
         <item>寻物启事</item>
         <item>闲置物品</item>
         <item>校园跑腿</item>
-    </string-array>
-
-    <string-array name="time_spinner">
-        <item>00:00—06:00</item>
-        <item>06:00—12:00</item>
-        <item>12:00—18:00</item>
-        <item>18:00—24:00</item>
     </string-array>
 
 </resources>

@@ -31,6 +31,15 @@
 
             </android.support.design.widget.AppBarLayout>
 
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:max="100"
+                android:visibility="invisible"
+                android:progressDrawable="@drawable/progress_bar_style"/>
+
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

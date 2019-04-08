@@ -153,6 +153,12 @@ public class QuestionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     imgPaths.add(mContext.getResources().getString(R.string.server_ip) + "image/" + questionItem.getUserId() + "/" + imgPath);
                 }
                 GridLayoutManager layoutManager = new GridLayoutManager(mContext, 3);
+                ImageGridViewAdapter adapter = new ImageGridViewAdapter(imgPaths);
+                ((NormalViewHolder) holder).mRecyclerView.setLayoutManager(layoutManager);
+                ((NormalViewHolder) holder).mRecyclerView.setAdapter(adapter);
+            }else {
+                List<String> imgPaths = new ArrayList<>();
+                GridLayoutManager layoutManager = new GridLayoutManager(mContext, 3);
                 ImageAdapter adapter = new ImageAdapter(imgPaths);
                 ((NormalViewHolder) holder).mRecyclerView.setLayoutManager(layoutManager);
                 ((NormalViewHolder) holder).mRecyclerView.setAdapter(adapter);

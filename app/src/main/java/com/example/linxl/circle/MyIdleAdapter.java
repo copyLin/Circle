@@ -1,6 +1,5 @@
 package com.example.linxl.circle;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -24,7 +22,6 @@ import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.IdleItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
-import com.example.linxl.circle.utils.TimeCapture;
 
 import java.io.IOException;
 import java.util.List;
@@ -237,6 +234,8 @@ public class MyIdleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             ((NormalViewHolder) holder).idlePrice.setText("¥ " + idleItem.getPrice());
             if (!idleItem.getIdleImgs().isEmpty()) {
                 Glide.with(mContext).load(mContext.getResources().getString(R.string.server_ip) + "image/" + idleItem.getUserId() + "/" + idleItem.getIdleImgs().get(0)).into(((NormalViewHolder) holder).mImageView);
+            }else {
+                Glide.with(mContext).load(R.drawable.img_idle).into(((NormalViewHolder) holder).mImageView);
             }
 
         }else if (holder instanceof FooterViewHolder){

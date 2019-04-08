@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.UserItem;
@@ -24,6 +25,7 @@ import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private ProgressBar mProgressBar;
     private EditText userId;
     private EditText password;
     private ImageButton login;
@@ -37,21 +39,29 @@ public class LoginActivity extends AppCompatActivity {
         userId = (EditText) findViewById(R.id.user_id);
         password = (EditText) findViewById(R.id.password);
         login = (ImageButton) findViewById(R.id.button_login);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mProgressBar.setVisibility(View.VISIBLE);
+
                 String address = getString(R.string.server_ip) + "loginServlet";
                 RequestBody requestBody = new FormBody.Builder()
                         .add("userId", userId.getText().toString())
                         .add("password", password.getText().toString())
                         .build();
+
+                mProgressBar.setProgress(60);
+
                 HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                mProgressBar.setProgress(100);
+                                mProgressBar.setVisibility(View.INVISIBLE);
                                 Toast.makeText(LoginActivity.this, "登录请求失败", Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -64,18 +74,22 @@ public class LoginActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    mProgressBar.setProgress(100);
                                     switch (responseData) {
                                         case "LoginSuccess":
                                             String id = userId.getText().toString();
                                             requestForUserInformation(id);
                                             break;
                                         case "WrongNumber":
+                                            mProgressBar.setVisibility(View.INVISIBLE);
                                             Toast.makeText(LoginActivity.this, "账号或密码错误", Toast.LENGTH_SHORT).show();
                                             break;
                                         case "NullError":
+                                            mProgressBar.setVisibility(View.INVISIBLE);
                                             Toast.makeText(LoginActivity.this, "请输入账号和密码", Toast.LENGTH_SHORT).show();
                                             break;
                                         default:
+                                            mProgressBar.setVisibility(View.INVISIBLE);
                                             Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
                                             break;
                                     }

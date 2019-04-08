@@ -1,7 +1,5 @@
 package com.example.linxl.circle;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
@@ -21,7 +19,6 @@ import com.example.linxl.circle.utils.ActivityCollector;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
 
-import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;

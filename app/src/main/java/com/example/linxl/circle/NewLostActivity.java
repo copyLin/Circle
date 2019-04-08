@@ -15,15 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -189,8 +185,6 @@ public class NewLostActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                mProgressBar.setProgress(50);
-
                 final MultipartBody.Builder multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
                 multipartBody.addFormDataPart("userId", userId);
                 multipartBody.addFormDataPart("content", lostContent);
@@ -209,37 +203,44 @@ public class NewLostActivity extends AppCompatActivity {
                     }
                 }
 
-                RequestBody requestBody = multipartBody.build();
-                String address = getString(R.string.server_ip) + "newLostServlet";
+                if (!lostTime.equals("") && !lostLocation.equals("") && !lostContact.equals("") && !lostContent.equals("")){
+                    RequestBody requestBody = multipartBody.build();
+                    String address = getString(R.string.server_ip) + "newLostServlet";
 
-                HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        NewLostActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressBar.setProgress(100);
-                                mProgressBar.setVisibility(View.INVISIBLE);
-                                Toast.makeText(NewLostActivity.this, "信息发送失败", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    mProgressBar.setProgress(60);
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
+                    HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
                             NewLostActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     mProgressBar.setProgress(100);
-                                    Toast.makeText(NewLostActivity.this, "信息发送成功", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    mProgressBar.setVisibility(View.INVISIBLE);
+                                    Toast.makeText(NewLostActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
 
-                    }
-                });
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if (response.isSuccessful()) {
+                                NewLostActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mProgressBar.setProgress(100);
+                                        Toast.makeText(NewLostActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                });
+                            }
+
+                        }
+                    });
+                }else {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(NewLostActivity.this, "请将内容填写完整", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
                 break;

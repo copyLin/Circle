@@ -4,8 +4,16 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     tools:context="com.example.linxl.circle.LoginActivity">
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="100"
+        android:visibility="invisible"
+        android:progressDrawable="@drawable/progress_bar_style"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -67,6 +75,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:layout_marginBottom="16dp"
         android:gravity="center_horizontal|bottom">
 
         <TextView

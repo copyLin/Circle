@@ -1,6 +1,5 @@
 package com.example.linxl.circle;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -23,7 +21,6 @@ import com.bumptech.glide.Glide;
 import com.example.linxl.circle.gson.DeliveryItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.example.linxl.circle.utils.SPUtil;
-import com.example.linxl.circle.utils.TimeCapture;
 
 import java.io.IOException;
 import java.util.List;

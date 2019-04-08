@@ -13,8 +13,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.linxl.circle.gson.DeliveryItem;
-import com.example.linxl.circle.gson.IdleItem;
-import com.example.linxl.circle.gson.LostItem;
 import com.example.linxl.circle.utils.HttpUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

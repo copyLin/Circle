@@ -134,8 +134,6 @@ public class NewIdleActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                mProgressBar.setProgress(50);
-
                 MultipartBody.Builder multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM);
                 multipartBody.addFormDataPart("userId", userId);
                 multipartBody.addFormDataPart("name", idleName);
@@ -152,37 +150,44 @@ public class NewIdleActivity extends AppCompatActivity {
                     }
                 }
 
-                RequestBody requestBody = multipartBody.build();
-                String address = getString(R.string.server_ip) + "newIdleServlet";
+                if (!idleName.equals("") && !idleContent.equals("") && !idlePrice.equals("")){
+                    RequestBody requestBody = multipartBody.build();
+                    String address = getString(R.string.server_ip) + "newIdleServlet";
 
-                HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        NewIdleActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressBar.setProgress(100);
-                                mProgressBar.setVisibility(View.INVISIBLE);
-                                Toast.makeText(NewIdleActivity.this, "信息发送失败", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    mProgressBar.setProgress(60);
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
+                    HttpUtil.sendOkHttpRequest(address, requestBody, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
                             NewIdleActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     mProgressBar.setProgress(100);
-                                    Toast.makeText(NewIdleActivity.this, "信息发送成功", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    mProgressBar.setVisibility(View.INVISIBLE);
+                                    Toast.makeText(NewIdleActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
 
-                    }
-                });
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if (response.isSuccessful()) {
+                                NewIdleActivity.this.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mProgressBar.setProgress(100);
+                                        Toast.makeText(NewIdleActivity.this, "发送成功", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                });
+                            }
+
+                        }
+                    });
+                }else {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(NewIdleActivity.this, "请将内容填写完整", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
                 break;
